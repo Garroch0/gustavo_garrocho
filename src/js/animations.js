@@ -1,13 +1,13 @@
 /**
- * Gustavo Garrocho — Motor de Texto Interativo 2xa.studio (Hero + Seção CTA)
- * Deslizamento por Linhas + Repulsão Vetorial Elástica + Opacidade Neon Verde-Lima
+ * Gustavo Garrocho — Motor de Texto Interativo 2xa.studio
+ * Otimização Ultra-Performática para Mobile (IntersectionObserver + Particle Throttling)
  * DPOS 2026
  */
 
 document.addEventListener('DOMContentLoaded', () => {
 
   // --------------------------------------------------------------------------
-  // 1. MOTOR CANVAS 2D DE TEXTO INTERATIVO (REUTILIZÁVEL HERO & CTA)
+  // 1. MOTOR CANVAS 2D DE TEXTO INTERATIVO (PAUSA INTELIGENTE QUANDO FORA DA TELA)
   // --------------------------------------------------------------------------
   class InteractiveTextBackground {
     constructor(canvasId = 'hero-text-canvas', sectionId = 'hero') {
@@ -16,18 +16,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
       this.ctx = this.canvas.getContext('2d');
       this.heroSection = document.getElementById(sectionId);
+      if (!this.heroSection) return;
 
-      // Parágrafos de texto denso em estilo editorial/brutalista (2xa.studio)
       this.rawText = `DRIVEN DESIGN STUDIO BETWEEN BRAND STRATEGY VISUAL IDENTITY DIGITIZATION PROCESSES SHAPED BY INPUT NO SINGLE OUTCOME IS TREATED AS FINAL SYSTEMATICS UNFOLD THROUGH DEPENDENCY AND ITERATION EACH STATE EMERGES FROM PREVIOUS CONDITIONS AND INFLUENCES WHAT FOLLOWS CHANGE IS NOT AN EFFECT APPLIED AFTERWARD BUT AN INHERENT PROPERTY OF THE SYSTEM COMPUTATIONAL DESIGN DRAWS INPUT FROM EXISTING CONDITIONS INCLUDING MACHINE PROCESSES HUMAN INTENTIONS AND BRAND STRATEGY `;
 
       this.particles = [];
-      this.mouse = { x: -9999, y: -9999, radius: 240, active: false };
+      this.mouse = { x: -9999, y: -9999, radius: 200, active: false };
       this.time = 0;
+      this.isIntersecting = false;
+      this.animationFrameId = null;
 
-      this.fontSize = 13;
-      this.lineHeight = 21;
-      this.letterSpacing = 11;
-      this.lineSpeeds = [];
+      // Responsividade de Densidade (Em mobile reduz o peso de processamento para 100 em PageSpeed)
+      const isMobile = window.innerWidth < 768;
+      this.fontSize = isMobile ? 14 : 13;
+      this.lineHeight = isMobile ? 26 : 21;
+      this.letterSpacing = isMobile ? 18 : 11;
 
       if (document.fonts) {
         document.fonts.ready.then(() => this.init());
@@ -39,7 +42,28 @@ document.addEventListener('DOMContentLoaded', () => {
     init() {
       this.resize();
       this.bindEvents();
-      this.animate();
+      this.setupObserver();
+    }
+
+    setupObserver() {
+      // IntersectionObserver: PAUSA o canvas completamente quando a seção sai da tela do usuário
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          this.isIntersecting = entry.isIntersecting;
+          if (this.isIntersecting) {
+            if (!this.animationFrameId) {
+              this.animate();
+            }
+          } else {
+            if (this.animationFrameId) {
+              cancelAnimationFrame(this.animationFrameId);
+              this.animationFrameId = null;
+            }
+          }
+        });
+      }, { threshold: 0.05 });
+
+      observer.observe(this.heroSection);
     }
 
     resize() {
@@ -48,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
       this.width = rect.width;
       this.height = rect.height;
 
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5); // Limita DPR a 1.5 no mobile
       this.canvas.width = this.width * dpr;
       this.canvas.height = this.height * dpr;
       this.ctx.scale(dpr, dpr);
@@ -58,25 +82,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     createParticles() {
       this.particles = [];
-      this.lineSpeeds = [];
 
-      const cols = Math.floor(this.width / this.letterSpacing) + 6;
+      const cols = Math.floor(this.width / this.letterSpacing) + 4;
       const rows = Math.floor(this.height / this.lineHeight) + 2;
-
       const textLength = this.rawText.length;
 
       for (let r = 0; r < rows; r++) {
-        const direction = r % 2 === 0 ? 0.45 : -0.45;
-        this.lineSpeeds.push(direction);
-
-        let textOffset = (r * 15) % textLength;
+        const direction = r % 2 === 0 ? 0.35 : -0.35;
+        let textOffset = (r * 12) % textLength;
 
         for (let c = 0; c < cols; c++) {
           const char = this.rawText[(textOffset + c) % textLength];
 
           if (char === ' ') continue;
 
-          const originX = c * this.letterSpacing - this.letterSpacing * 2;
+          const originX = c * this.letterSpacing - this.letterSpacing;
           const originY = r * this.lineHeight + this.fontSize;
 
           this.particles.push({
@@ -87,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
             originY: originY,
             row: r,
             direction: direction,
-            density: (Math.random() * 25) + 15
+            density: (Math.random() * 18) + 10
           });
         }
       }
@@ -97,7 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
       window.addEventListener('resize', () => this.resize());
 
       window.addEventListener('mousemove', (e) => {
-        if (!this.heroSection) return;
+        if (!this.heroSection || !this.isIntersecting) return;
         const rect = this.heroSection.getBoundingClientRect();
         
         if (
@@ -115,7 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       window.addEventListener('touchmove', (e) => {
-        if (!this.heroSection || e.touches.length === 0) return;
+        if (!this.heroSection || !this.isIntersecting || e.touches.length === 0) return;
         const rect = this.heroSection.getBoundingClientRect();
         const touch = e.touches[0];
 
@@ -133,7 +153,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     animate() {
-      this.time += 0.025;
+      if (!this.isIntersecting) {
+        this.animationFrameId = null;
+        return;
+      }
+
+      this.time += 0.02;
       this.ctx.clearRect(0, 0, this.width, this.height);
       this.ctx.font = `${this.fontSize}px "Space Mono", monospace`;
 
@@ -142,10 +167,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         p.originX += p.direction;
 
-        if (p.originX > this.width + this.letterSpacing * 2) {
-          p.originX = -this.letterSpacing * 2;
-        } else if (p.originX < -this.letterSpacing * 2) {
-          p.originX = this.width + this.letterSpacing * 2;
+        if (p.originX > this.width + this.letterSpacing) {
+          p.originX = -this.letterSpacing;
+        } else if (p.originX < -this.letterSpacing) {
+          p.originX = this.width + this.letterSpacing;
         }
 
         const idleTargetX = p.originX;
@@ -165,7 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
           const forceDirectionX = dx / (distance || 1);
           const forceDirectionY = dy / (distance || 1);
-          const force = proximity * p.density * 4.8;
+          const force = proximity * p.density * 3.5;
 
           targetX = idleTargetX - forceDirectionX * force;
           targetY = idleTargetY - forceDirectionY * force;
@@ -190,14 +215,12 @@ document.addEventListener('DOMContentLoaded', () => {
         this.ctx.fillText(p.char, p.x, p.y);
       }
 
-      requestAnimationFrame(() => this.animate());
+      this.animationFrameId = requestAnimationFrame(() => this.animate());
     }
   }
 
-  // Inicializa o background de texto interativo 2xa.studio na Hero
+  // Inicializa com monitoramento de visão para economizar CPU no mobile
   new InteractiveTextBackground('hero-text-canvas', 'hero');
-
-  // Inicializa o background de texto interativo 2xa.studio na Seção CTA
   new InteractiveTextBackground('cta-text-canvas', 'contato');
 
   // --------------------------------------------------------------------------
