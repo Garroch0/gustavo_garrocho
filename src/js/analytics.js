@@ -1,11 +1,14 @@
 /**
  * Gustavo Garrocho — Rastreamento de Analytics (Meta Ads & Microsoft Clarity)
  * Meta Pixel ID Oficial: 2804627116587586
+ * Test Event Code: TEST11893
+ * Microsoft Clarity ID Oficial: skyn8ao5wu
  * DPOS 2026
  */
 
-const META_PIXEL_ID = '2804627116587586'; // Pixel oficial do Meta Ads
-const CLARITY_PROJECT_ID = 'SEU_CLARITY_ID_AQUI'; // Insira aqui seu ID do Microsoft Clarity (ex: 'abcde12345')
+const META_PIXEL_ID = '2804627116587586';
+const META_TEST_EVENT_CODE = 'TEST11893'; // Código de evento de teste para o Meta Ads
+const CLARITY_PROJECT_ID = 'skyn8ao5wu';  // ID oficial do Microsoft Clarity
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -21,11 +24,17 @@ document.addEventListener('DOMContentLoaded', () => {
     'https://connect.facebook.net/pt_BR/fbevents.js');
 
     fbq('init', META_PIXEL_ID);
+    
+    // Envia eventos para a aba de Eventos de Teste no Gerenciador do Meta
+    if (META_TEST_EVENT_CODE) {
+      fbq('set', 'testEventCode', META_TEST_EVENT_CODE);
+    }
+
     fbq('track', 'PageView');
   }
 
   // 2. INICIALIZAÇÃO DO MICROSOFT CLARITY (HEATMAPS & GRAVAÇÕES DE SESSÃO)
-  if (CLARITY_PROJECT_ID && CLARITY_PROJECT_ID !== 'SEU_CLARITY_ID_AQUI') {
+  if (CLARITY_PROJECT_ID) {
     (function(c,l,a,r,i,t,y){
         c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
         t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
@@ -40,7 +49,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   whatsappButtons.forEach(btn => {
     btn.addEventListener('click', () => {
-      // Dispara o evento de Contato no Meta Pixel
       if (typeof fbq === 'function') {
         fbq('track', 'Contact', {
           content_name: 'Clique Botão WhatsApp',
