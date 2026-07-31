@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <p class="project-category-text"><strong>CATEGORIA:</strong> ${proj.category}</p>
           <p class="project-desc">${proj.desc}</p>
           <a href="${proj.link}" target="_blank" rel="noopener" class="btn btn-project-behance">
-            VER CASE COMPLETO NO BEHANCE ↗
+            VER CASE COMPLETO NO BEHANCE ↗︎
           </a>
         </div>
         <div class="project-image-container">

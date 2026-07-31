@@ -585,6 +585,43 @@ h1, h2, h3, h4 {
   transition: color 0.35s ease;
 }
 
+/* Efeito de Seleção de Texto Global & Contrastes */
+::selection {
+  background-color: var(--color-lima) !important;
+  color: var(--color-carbono-deep) !important;
+}
+
+/* Seleção de Texto dentro dos Cards de Serviços em Hover */
+.card-inverted-default ::selection {
+  background-color: var(--color-carbono-deep) !important;
+  color: var(--color-lima) !important;
+}
+
+.card-inverted-default:hover ::selection {
+  background-color: var(--color-lima) !important;
+  color: var(--color-carbono-deep) !important;
+}
+
+.card-standard ::selection {
+  background-color: var(--color-lima) !important;
+  color: var(--color-carbono-deep) !important;
+}
+
+.card-standard:hover ::selection {
+  background-color: var(--color-carbono-deep) !important;
+  color: var(--color-lima) !important;
+}
+
+/* Prevenção de Emojis em Setas no Mobile (iOS / Android) */
+.arrow-text {
+  font-family: var(--font-body), sans-serif;
+  font-style: normal;
+  font-variant-emoji: text;
+  display: inline-block;
+  margin-left: 0.15em;
+  color: inherit;
+}
+
 /* --- CARD 1 (Identidade Visual): INVERTIDO POR PADRÃO --- */
 .card-inverted-default {
   background-color: var(--color-lima);
