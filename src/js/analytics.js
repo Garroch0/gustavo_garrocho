@@ -1,5 +1,6 @@
 /**
  * Gustavo Garrocho — Rastreamento de Analytics (Meta Ads & Microsoft Clarity)
+ * Carregamento diferido pós-LCP para 0ms de bloqueio de renderização
  * Meta Pixel ID Oficial: 2804627116587586
  * Test Event Code: TEST11893
  * Microsoft Clarity ID Oficial: skyn8ao5wu
@@ -7,12 +8,11 @@
  */
 
 const META_PIXEL_ID = '2804627116587586';
-const META_TEST_EVENT_CODE = 'TEST11893'; // Código de evento de teste no Gerenciador do Meta Ads
-const CLARITY_PROJECT_ID = 'skyn8ao5wu';  // ID oficial do Microsoft Clarity
+const META_TEST_EVENT_CODE = 'TEST11893';
+const CLARITY_PROJECT_ID = 'skyn8ao5wu';
 
-document.addEventListener('DOMContentLoaded', () => {
-
-  // 1. INICIALIZAÇÃO SEGURA DO META PIXEL (COM TRATAMENTO DE ADBLOCK)
+function initAnalytics() {
+  // 1. INICIALIZAÇÃO SEGURA DO META PIXEL
   if (META_PIXEL_ID) {
     try {
       !function(f,b,e,v,n,t,s)
@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
       n.queue=[];t=b.createElement(e);t.async=!0;
       t.onerror = function() {
-        console.log('[Analytics Notice] O script do Meta Pixel foi mantido em espera (bloqueador de anúncios ativo no navegador).');
+        console.log('[Analytics Notice] Meta Pixel mantido em espera pelo cliente.');
       };
       t.src=v;s=b.getElementsByTagName(e)[0];
       s.parentNode.insertBefore(t,s)}(window, document,'script',
@@ -29,15 +29,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
       fbq('init', META_PIXEL_ID);
       
-      // Envia o código de evento de teste para o Gerenciador do Meta Ads
       if (META_TEST_EVENT_CODE) {
         fbq('set', 'testEventCode', META_TEST_EVENT_CODE);
       }
 
       fbq('track', 'PageView');
-    } catch (err) {
-      console.log('[Analytics] Meta Pixel controlado pelo cliente.');
-    }
+    } catch (err) {}
   }
 
   // 2. INICIALIZAÇÃO SEGURA DO MICROSOFT CLARITY
@@ -47,17 +44,24 @@ document.addEventListener('DOMContentLoaded', () => {
           c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
           t=l.createElement(r);t.async=1;
           t.onerror = function() {
-            console.log('[Analytics Notice] O script do Microsoft Clarity foi mantido em espera.');
+            console.log('[Analytics Notice] Clarity mantido em espera pelo cliente.');
           };
           t.src="https://www.clarity.ms/tag/"+i;
           y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
       })(window, document, "clarity", "script", CLARITY_PROJECT_ID);
-    } catch (err) {
-      console.log('[Analytics] Clarity controlado pelo cliente.');
-    }
+    } catch (err) {}
   }
+}
 
-  // 3. DISPARO AUTOMÁTICO E TESTE DE CONVERSÃO 'Contact' NOS BOTÕES DE WHATSAPP
+// Carregamento inteligente pós-renderização inicial (garante FCP e LCP ultrarrápidos)
+if (window.requestIdleCallback) {
+  window.requestIdleCallback(() => initAnalytics(), { timeout: 2500 });
+} else {
+  setTimeout(() => initAnalytics(), 2000);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // 3. DISPARO DO EVENTO DE CONVERSÃO 'Contact' NOS BOTÕES DE WHATSAPP
   const whatsappButtons = document.querySelectorAll(
     'a[href*="wa.me"], a[href*="whatsapp.com"], #whatsapp-link-btn, #hero-cta-btn, #header-cta-btn, .btn-about-cta'
   );

@@ -1,13 +1,13 @@
 /**
  * Gustavo Garrocho — Motor de Texto Interativo 2xa.studio
- * Otimizado com IntersectionObserver (0% CPU fora da tela) e Throttling Mobile
+ * Otimizado com Retentores de Layout Cache (0ms Reflow Forçado) e IntersectionObserver
  * DPOS 2026
  */
 
 document.addEventListener('DOMContentLoaded', () => {
 
   // --------------------------------------------------------------------------
-  // 1. MOTOR CANVAS 2D DE TEXTO INTERATIVO (REUTILIZÁVEL HERO & CTA)
+  // 1. MOTOR CANVAS 2D DE TEXTO INTERATIVO (REUTILIZÁVEL HERO & CTA - ZERO REFLOW)
   // --------------------------------------------------------------------------
   class InteractiveTextBackground {
     constructor(canvasId = 'hero-text-canvas', sectionId = 'hero') {
@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
       this.time = 0;
       this.isPaused = false;
       this.animationFrameId = null;
+      this.rectCache = null;
 
       // Ajuste adaptativo de densidade para dispositivos móveis
       const isMobile = window.innerWidth < 768;
@@ -42,10 +43,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     init() {
+      this.updateRectCache();
       this.resize();
       this.bindEvents();
       this.setupObserver();
       this.animate();
+    }
+
+    updateRectCache() {
+      if (this.heroSection) {
+        this.rectCache = this.heroSection.getBoundingClientRect();
+      }
     }
 
     // IntersectionObserver: pausa o canvas quando fora da visão (0% consumo de CPU no scroll)
@@ -74,9 +82,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     resize() {
       if (!this.heroSection) return;
-      const rect = this.heroSection.getBoundingClientRect();
-      this.width = rect.width;
-      this.height = rect.height;
+      this.updateRectCache();
+      
+      this.width = this.rectCache.width || this.heroSection.clientWidth;
+      this.height = this.rectCache.height || this.heroSection.clientHeight;
 
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       this.canvas.width = this.width * dpr;
@@ -125,10 +134,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     bindEvents() {
       window.addEventListener('resize', () => this.resize(), { passive: true });
+      window.addEventListener('scroll', () => this.updateRectCache(), { passive: true });
 
+      // Rastreamento de mouse com cache geométrico (0ms Reflow Forçado)
       window.addEventListener('mousemove', (e) => {
-        if (!this.heroSection || this.isPaused) return;
-        const rect = this.heroSection.getBoundingClientRect();
+        if (!this.heroSection || this.isPaused || !this.rectCache) return;
+        const rect = this.rectCache;
         
         if (
           e.clientX >= rect.left &&
@@ -145,8 +156,8 @@ document.addEventListener('DOMContentLoaded', () => {
       }, { passive: true });
 
       window.addEventListener('touchmove', (e) => {
-        if (!this.heroSection || this.isPaused || e.touches.length === 0) return;
-        const rect = this.heroSection.getBoundingClientRect();
+        if (!this.heroSection || this.isPaused || !this.rectCache || e.touches.length === 0) return;
+        const rect = this.rectCache;
         const touch = e.touches[0];
 
         if (
