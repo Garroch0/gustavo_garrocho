@@ -1,13 +1,13 @@
 /**
  * Gustavo Garrocho — Motor de Texto Interativo 2xa.studio
- * Flutuação Estritamente Horizontal + Onda Expandida + Opacidade Gradativa Radial
+ * Deslizamento Contínuo por Linhas Alternadas (Esquerda / Direita) + Onda Interativa no Mouse
  * DPOS 2026
  */
 
 document.addEventListener('DOMContentLoaded', () => {
 
   // --------------------------------------------------------------------------
-  // 1. MOTOR CANVAS 2D DE TEXTO INTERATIVO (ONDA & OPACIDADE GRADATIVA)
+  // 1. MOTOR CANVAS 2D DE TEXTO INTERATIVO (DESLIZAMENTO POR LINHAS CONTINUAS)
   // --------------------------------------------------------------------------
   class InteractiveTextBackground {
     constructor() {
@@ -18,15 +18,16 @@ document.addEventListener('DOMContentLoaded', () => {
       this.heroSection = document.getElementById('hero');
 
       // Parágrafos de texto denso em estilo editorial/brutalista (2xa.studio)
-      this.rawText = `DRIVEN DESIGN STUDIO BETWEEN BRAND STRATEGY VISUAL IDENTITY DIGITIZATION PROCESSES SHAPED BY INPUT NO SINGLE OUTCOME IS TREATED AS FINAL SYSTEMATICS UNFOLD THROUGH DEPENDENCY AND ITERATION EACH STATE EMERGES FROM PREVIOUS CONDITIONS AND INFLUENCES WHAT FOLLOWS CHANGE IS NOT AN EFFECT APPLIED AFTERWARD BUT AN INHERENT PROPERTY OF THE SYSTEM COMPUTATIONAL DESIGN DRAWS INPUT FROM EXISTING CONDITIONS INCLUDING MACHINE PROCESSES HUMAN INTENTIONS AND BRAND STRATEGY`;
+      this.rawText = `DRIVEN DESIGN STUDIO BETWEEN BRAND STRATEGY VISUAL IDENTITY DIGITIZATION PROCESSES SHAPED BY INPUT NO SINGLE OUTCOME IS TREATED AS FINAL SYSTEMATICS UNFOLD THROUGH DEPENDENCY AND ITERATION EACH STATE EMERGES FROM PREVIOUS CONDITIONS AND INFLUENCES WHAT FOLLOWS CHANGE IS NOT AN EFFECT APPLIED AFTERWARD BUT AN INHERENT PROPERTY OF THE SYSTEM COMPUTATIONAL DESIGN DRAWS INPUT FROM EXISTING CONDITIONS INCLUDING MACHINE PROCESSES HUMAN INTENTIONS AND BRAND STRATEGY `;
 
       this.particles = [];
-      this.mouse = { x: -9999, y: -9999, radius: 220, active: false }; // Influência expandida (220px)
+      this.mouse = { x: -9999, y: -9999, radius: 220, active: false };
       this.time = 0;
 
       this.fontSize = 13;
       this.lineHeight = 21;
       this.letterSpacing = 11;
+      this.lineSpeeds = []; // Velocidade e direção únicas por linha
 
       if (document.fonts) {
         document.fonts.ready.then(() => this.init());
@@ -57,20 +58,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
     createParticles() {
       this.particles = [];
-      const cols = Math.floor(this.width / this.letterSpacing) + 2;
+      this.lineSpeeds = [];
+
+      const cols = Math.floor(this.width / this.letterSpacing) + 6;
       const rows = Math.floor(this.height / this.lineHeight) + 2;
 
-      let textIndex = 0;
       const textLength = this.rawText.length;
 
       for (let r = 0; r < rows; r++) {
+        // Alterna a direção da linha: pares para a direita (+1), ímpares para a esquerda (-1)
+        const direction = r % 2 === 0 ? 0.45 : -0.45;
+        this.lineSpeeds.push(direction);
+
+        let textOffset = (r * 15) % textLength;
+
         for (let c = 0; c < cols; c++) {
-          const char = this.rawText[textIndex % textLength];
-          textIndex++;
+          const char = this.rawText[(textOffset + c) % textLength];
 
           if (char === ' ') continue;
 
-          const originX = c * this.letterSpacing;
+          const originX = c * this.letterSpacing - this.letterSpacing * 2;
           const originY = r * this.lineHeight + this.fontSize;
 
           this.particles.push({
@@ -79,9 +86,8 @@ document.addEventListener('DOMContentLoaded', () => {
             y: originY,
             originX: originX,
             originY: originY,
-            phase: Math.random() * Math.PI * 2,
-            speed: 0.0012 + Math.random() * 0.001,
-            ampX: 4.5 + Math.random() * 4 // Apenas amplitude horizontal
+            row: r,
+            direction: direction
           });
         }
       }
@@ -131,31 +137,41 @@ document.addEventListener('DOMContentLoaded', () => {
       this.ctx.clearRect(0, 0, this.width, this.height);
       this.ctx.font = `${this.fontSize}px "Space Mono", monospace`;
 
+      const boundsWidth = this.width + this.letterSpacing * 4;
+
       for (let i = 0; i < this.particles.length; i++) {
         const p = this.particles[i];
 
-        // 1. Flutuação Randômica ESTRITAMENTE HORIZONTAL em Repouso (Eixo X)
-        const idleTargetX = p.originX + Math.sin(this.time * p.speed * 60 + p.phase) * p.ampX;
-        const idleTargetY = p.originY; // Eixo Y 100% estático
+        // 1. Deslizamento Contínuo da Linha em Direção Única (Esquerda ou Direita)
+        p.originX += p.direction;
 
-        // 2. Interação de Onda e Opacidade Gradativa Radial sob o Cursor
+        // Loop Infinito do Caractere ao Sair da Tela
+        if (p.originX > this.width + this.letterSpacing * 2) {
+          p.originX = -this.letterSpacing * 2;
+        } else if (p.originX < -this.letterSpacing * 2) {
+          p.originX = this.width + this.letterSpacing * 2;
+        }
+
+        const idleTargetX = p.originX;
+        const idleTargetY = p.originY;
+
+        // 2. Interação de Onda e Opacidade Gradativa Radial no Cursor
         const dx = this.mouse.x - p.x;
         const dy = this.mouse.y - p.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
 
         let targetX = idleTargetX;
         let targetY = idleTargetY;
-        let alpha = 0.28; // Opacidade base da marca d'água
+        let alpha = 0.28;
         let isHovered = false;
 
         if (distance < this.mouse.radius && this.mouse.active) {
           isHovered = true;
-          const proximity = (this.mouse.radius - distance) / this.mouse.radius; // 0 (borda) a 1 (centro)
+          const proximity = (this.mouse.radius - distance) / this.mouse.radius;
 
-          // Opacidade Gradativa Progressiva (Mais forte no centro, diminuindo suavemente)
-          alpha = 0.28 + (proximity * 0.70); // Chega a ~0.98 no centro exato do cursor!
+          alpha = 0.28 + (proximity * 0.70); // Opacidade gradativa radial (até 0.98)
 
-          // Onda Senoidal Expandida (Influência de 35px)
+          // Onda Senoidal sobre o Deslizamento de Linha
           const waveAngle = Math.sin(distance * 0.05 - this.time * 4.5);
           const forceDirectionX = dx / (distance || 1);
           const forceDirectionY = dy / (distance || 1);
@@ -165,15 +181,15 @@ document.addEventListener('DOMContentLoaded', () => {
           targetY = idleTargetY - forceDirectionY * force;
         }
 
-        // Interpolação elástica em direção aos alvos (60fps)
-        p.x += (targetX - p.x) * 0.12;
-        p.y += (targetY - p.y) * 0.12;
+        // Interpolação suave em 60fps
+        p.x += (targetX - p.x) * 0.15;
+        p.y += (targetY - p.y) * 0.15;
 
-        // Estilização com Gradiente de Cor e Opacidade Gradativa
+        // Renderização com Destaque de Cor e Transparência Gradativa
         if (isHovered) {
           const proximity = (this.mouse.radius - distance) / this.mouse.radius;
           if (proximity > 0.4) {
-            this.ctx.fillStyle = `rgba(199, 240, 50, ${alpha.toFixed(2)})`; // Verde-Lima forte no centro
+            this.ctx.fillStyle = `rgba(199, 240, 50, ${alpha.toFixed(2)})`; // Verde-Lima vibrante no centro do mouse
           } else {
             this.ctx.fillStyle = `rgba(242, 242, 242, ${alpha.toFixed(2)})`; // Off-White na borda
           }
