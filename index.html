@@ -6,7 +6,7 @@
   <title>Gustavo Garrocho — Designer & Estrategista de Marca</title>
   
   <!-- Favicon Oficial GG. (Imagem 2) -->
-  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=22">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=23">
   
   <!-- Meta Tags Principais & SEO -->
   <meta name="description" content="Gustavo Garrocho — Designer & Estrategista de Marca. Criação de identidades visuais, estratégia de marca, gestão de tráfego, embalagens e expressão digital.">
@@ -14,38 +14,34 @@
   <meta name="author" content="Gustavo Garrocho">
   <meta name="robots" content="index, follow">
   <meta name="theme-color" content="#121413">
-  <link rel="canonical" href="http://localhost:3000/">
+  <link rel="canonical" href="https://gustavogarrocho.com.br/">
   
   <!-- OpenGraph (Facebook / WhatsApp / LinkedIn) -->
   <meta property="og:type" content="website">
-  <meta property="og:url" content="http://localhost:3000/">
+  <meta property="og:url" content="https://gustavogarrocho.com.br/">
   <meta property="og:title" content="Gustavo Garrocho — Designer & Estrategista de Marca">
   <meta property="og:description" content="Crio marcas com conceito, impacto e consistência. Conheça nossos serviços, projetos e metodologia de trabalho.">
-  <meta property="og:image" content="src/assets/img/gustavo-garrocho.svg">
+  <meta property="og:image" content="src/assets/img/gustavo-garrocho.jpg">
 
   <!-- Twitter Cards -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Gustavo Garrocho — Designer & Estrategista de Marca">
   <meta name="twitter:description" content="Crio marcas com conceito, impacto e consistência.">
-  <meta name="twitter:image" content="src/assets/img/gustavo-garrocho.svg">
+  <meta name="twitter:image" content="src/assets/img/gustavo-garrocho.jpg">
   
-  <!-- Otimizações de Conexão (Preconnect & DNS Prefetch) -->
+  <!-- Pré-conexão Otimizada para Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
-  <link rel="dns-prefetch" href="https://unpkg.com">
-  <link rel="dns-prefetch" href="https://mir-s3-cdn-cf.behance.net">
+  <link rel="dns-prefetch" href="https://api.rss2json.com">
 
-  <!-- Google Fonts: Antonio (Condensed H1/H2), DM Sans (Body), Space Mono (Monospace) -->
+  <!-- Google Fonts: Antonio (Condensed H1/H2), DM Sans (Body), Space Mono com font-display=swap -->
   <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@700&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
   
-  <!-- Lenis Smooth Scroll CSS (Studio Freight) -->
-  <link rel="stylesheet" href="https://unpkg.com/lenis@1.1.18/dist/lenis.css">
-
-  <!-- Estilos Core com Cache-Busting v=22 -->
-  <link rel="stylesheet" href="src/css/reset.css?v=22">
-  <link rel="stylesheet" href="src/css/variables.css?v=22">
-  <link rel="stylesheet" href="src/css/main.css?v=22">
+  <!-- Estilos Core Locais (0ms de Latência Externa) -->
+  <link rel="stylesheet" href="src/css/vendor/lenis.css?v=23">
+  <link rel="stylesheet" href="src/css/reset.css?v=23">
+  <link rel="stylesheet" href="src/css/variables.css?v=23">
+  <link rel="stylesheet" href="src/css/main.css?v=23">
 
   <!-- Dados Estruturados JSON-LD (Schema.org SEO) -->
   <script type="application/ld+json">
@@ -55,7 +51,7 @@
     "name": "Gustavo Garrocho",
     "jobTitle": "Designer & Estrategista de Marca",
     "description": "Estudante de Publicidade e Propaganda na PUC Minas, especialista em Identidade Visual, Estratégia de Marca e Gestão de Tráfego.",
-    "url": "http://localhost:3000/",
+    "url": "https://gustavogarrocho.com.br/",
     "sameAs": [
       "https://www.behance.net/Garrocho",
       "https://www.linkedin.com/in/garrocho/",
@@ -150,9 +146,9 @@
           </div>
         </div>
         
-        <!-- Coluna da Foto Oficial à Direita (SVG Otimizado) -->
+        <!-- Coluna da Foto Oficial à Direita (Otimização LCP Alta Velocidade) -->
         <div class="about-image-container">
-          <img src="src/assets/img/gustavo-garrocho.svg" alt="Gustavo Garrocho — Designer e Estrategista de Marca" class="about-photo" loading="eager" decoding="async" width="1000" height="1200" />
+          <img src="src/assets/img/gustavo-garrocho.jpg" alt="Gustavo Garrocho — Designer e Estrategista de Marca" class="about-photo" loading="eager" fetchpriority="high" decoding="async" width="600" height="720" />
         </div>
       </div>
     </section>
@@ -323,15 +319,15 @@
     </div>
   </footer>
 
-  <!-- Scripts Core: Lenis Smooth Scroll + GSAP + ScrollTrigger (via CDN) -->
-  <script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-  
-  <!-- Scripts do App com Cache-Busting v=22 -->
-  <script src="src/js/analytics.js?v=22"></script>
-  <script src="src/js/app.js?v=22"></script>
-  <script src="src/js/behance-integration.js?v=22"></script>
-  <script src="src/js/animations.js?v=22"></script>
+  <!-- Scripts Vendor Locais Não-Bloqueantes (Com atributo defer para 0ms de bloqueio de renderização) -->
+  <script src="src/js/vendor/lenis.min.js" defer></script>
+  <script src="src/js/vendor/gsap.min.js" defer></script>
+  <script src="src/js/vendor/ScrollTrigger.min.js" defer></script>
+
+  <!-- Scripts da Aplicação -->
+  <script src="src/js/analytics.js?v=23" defer></script>
+  <script src="src/js/app.js?v=23" defer></script>
+  <script src="src/js/behance-integration.js?v=23" defer></script>
+  <script src="src/js/animations.js?v=23" defer></script>
 </body>
 </html>
