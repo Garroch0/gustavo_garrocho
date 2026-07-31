@@ -1,13 +1,13 @@
 /**
  * Gustavo Garrocho — Motor de Texto Interativo 2xa.studio
- * Desempenho Otimizado PageSpeed Mobile 95+ (Desktop 60fps / Mobile Ultra-Light)
+ * Otimizado com IntersectionObserver (0% CPU fora da tela) e Throttling Mobile
  * DPOS 2026
  */
 
 document.addEventListener('DOMContentLoaded', () => {
 
   // --------------------------------------------------------------------------
-  // 1. MOTOR CANVAS 2D DE TEXTO INTERATIVO (DESKTOP 60FPS / MOBILE 0MS TBT)
+  // 1. MOTOR CANVAS 2D DE TEXTO INTERATIVO (REUTILIZÁVEL HERO & CTA)
   // --------------------------------------------------------------------------
   class InteractiveTextBackground {
     constructor(canvasId = 'hero-text-canvas', sectionId = 'hero') {
@@ -18,18 +18,21 @@ document.addEventListener('DOMContentLoaded', () => {
       this.heroSection = document.getElementById(sectionId);
       if (!this.heroSection) return;
 
+      // Parágrafos de texto denso em estilo editorial/brutalista (2xa.studio)
       this.rawText = `DRIVEN DESIGN STUDIO BETWEEN BRAND STRATEGY VISUAL IDENTITY DIGITIZATION PROCESSES SHAPED BY INPUT NO SINGLE OUTCOME IS TREATED AS FINAL SYSTEMATICS UNFOLD THROUGH DEPENDENCY AND ITERATION EACH STATE EMERGES FROM PREVIOUS CONDITIONS AND INFLUENCES WHAT FOLLOWS CHANGE IS NOT AN EFFECT APPLIED AFTERWARD BUT AN INHERENT PROPERTY OF THE SYSTEM COMPUTATIONAL DESIGN DRAWS INPUT FROM EXISTING CONDITIONS INCLUDING MACHINE PROCESSES HUMAN INTENTIONS AND BRAND STRATEGY `;
 
       this.particles = [];
       this.mouse = { x: -9999, y: -9999, radius: 240, active: false };
       this.time = 0;
-      this.isIntersecting = false;
+      this.isPaused = false;
       this.animationFrameId = null;
 
-      this.isMobile = window.innerWidth <= 768;
-      this.fontSize = this.isMobile ? 14 : 13;
-      this.lineHeight = this.isMobile ? 24 : 21;
-      this.letterSpacing = this.isMobile ? 16 : 11;
+      // Ajuste adaptativo de densidade para dispositivos móveis
+      const isMobile = window.innerWidth < 768;
+      this.fontSize = isMobile ? 12 : 13;
+      this.lineHeight = isMobile ? 26 : 21;
+      this.letterSpacing = isMobile ? 16 : 11;
+      this.lineSpeeds = [];
 
       if (document.fonts) {
         document.fonts.ready.then(() => this.init());
@@ -41,34 +44,32 @@ document.addEventListener('DOMContentLoaded', () => {
     init() {
       this.resize();
       this.bindEvents();
-
-      if (this.isMobile) {
-        // No Mobile: Renderiza os caracteres estaticamente apenas 1 vez (0ms TBT de CPU)
-        this.renderStatic();
-      } else {
-        // No Desktop: Ativa o monitoramento por IntersectionObserver e o loop 60fps
-        this.setupObserver();
-      }
+      this.setupObserver();
+      this.animate();
     }
 
+    // IntersectionObserver: pausa o canvas quando fora da visão (0% consumo de CPU no scroll)
     setupObserver() {
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-          this.isIntersecting = entry.isIntersecting;
-          if (this.isIntersecting) {
-            if (!this.animationFrameId) {
-              this.animate();
+      if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              if (this.isPaused) {
+                this.isPaused = false;
+                this.animate();
+              }
+            } else {
+              this.isPaused = true;
+              if (this.animationFrameId) {
+                cancelAnimationFrame(this.animationFrameId);
+                this.animationFrameId = null;
+              }
             }
-          } else {
-            if (this.animationFrameId) {
-              cancelAnimationFrame(this.animationFrameId);
-              this.animationFrameId = null;
-            }
-          }
-        });
-      }, { threshold: 0.05 });
+          });
+        }, { threshold: 0.05 });
 
-      observer.observe(this.heroSection);
+        observer.observe(this.heroSection);
+      }
     }
 
     resize() {
@@ -77,25 +78,27 @@ document.addEventListener('DOMContentLoaded', () => {
       this.width = rect.width;
       this.height = rect.height;
 
-      const dpr = Math.min(window.devicePixelRatio || 1, this.isMobile ? 1 : 1.5);
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
       this.canvas.width = this.width * dpr;
       this.canvas.height = this.height * dpr;
       this.ctx.scale(dpr, dpr);
 
       this.createParticles();
-      if (this.isMobile) {
-        this.renderStatic();
-      }
     }
 
     createParticles() {
       this.particles = [];
-      const cols = Math.floor(this.width / this.letterSpacing) + 4;
+      this.lineSpeeds = [];
+
+      const cols = Math.floor(this.width / this.letterSpacing) + 6;
       const rows = Math.floor(this.height / this.lineHeight) + 2;
+
       const textLength = this.rawText.length;
 
       for (let r = 0; r < rows; r++) {
         const direction = r % 2 === 0 ? 0.45 : -0.45;
+        this.lineSpeeds.push(direction);
+
         let textOffset = (r * 15) % textLength;
 
         for (let c = 0; c < cols; c++) {
@@ -103,7 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
           if (char === ' ') continue;
 
-          const originX = c * this.letterSpacing - this.letterSpacing;
+          const originX = c * this.letterSpacing - this.letterSpacing * 2;
           const originY = r * this.lineHeight + this.fontSize;
 
           this.particles.push({
@@ -121,45 +124,46 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     bindEvents() {
-      window.addEventListener('resize', () => this.resize());
+      window.addEventListener('resize', () => this.resize(), { passive: true });
 
-      if (!this.isMobile) {
-        window.addEventListener('mousemove', (e) => {
-          if (!this.heroSection || !this.isIntersecting) return;
-          const rect = this.heroSection.getBoundingClientRect();
-          
-          if (
-            e.clientX >= rect.left &&
-            e.clientX <= rect.right &&
-            e.clientY >= rect.top &&
-            e.clientY <= rect.bottom
-          ) {
-            this.mouse.x = e.clientX - rect.left;
-            this.mouse.y = e.clientY - rect.top;
-            this.mouse.active = true;
-          } else {
-            this.mouse.active = false;
-          }
-        });
-      }
-    }
+      window.addEventListener('mousemove', (e) => {
+        if (!this.heroSection || this.isPaused) return;
+        const rect = this.heroSection.getBoundingClientRect();
+        
+        if (
+          e.clientX >= rect.left &&
+          e.clientX <= rect.right &&
+          e.clientY >= rect.top &&
+          e.clientY <= rect.bottom
+        ) {
+          this.mouse.x = e.clientX - rect.left;
+          this.mouse.y = e.clientY - rect.top;
+          this.mouse.active = true;
+        } else {
+          this.mouse.active = false;
+        }
+      }, { passive: true });
 
-    renderStatic() {
-      this.ctx.clearRect(0, 0, this.width, this.height);
-      this.ctx.font = `${this.fontSize}px "Space Mono", monospace`;
-      this.ctx.fillStyle = 'rgba(242, 242, 242, 0.28)';
+      window.addEventListener('touchmove', (e) => {
+        if (!this.heroSection || this.isPaused || e.touches.length === 0) return;
+        const rect = this.heroSection.getBoundingClientRect();
+        const touch = e.touches[0];
 
-      for (let i = 0; i < this.particles.length; i++) {
-        const p = this.particles[i];
-        this.ctx.fillText(p.char, p.originX, p.originY);
-      }
+        if (
+          touch.clientX >= rect.left &&
+          touch.clientX <= rect.right &&
+          touch.clientY >= rect.top &&
+          touch.clientY <= rect.bottom
+        ) {
+          this.mouse.x = touch.clientX - rect.left;
+          this.mouse.y = touch.clientY - rect.top;
+          this.mouse.active = true;
+        }
+      }, { passive: true });
     }
 
     animate() {
-      if (!this.isIntersecting || this.isMobile) {
-        this.animationFrameId = null;
-        return;
-      }
+      if (this.isPaused) return;
 
       this.time += 0.025;
       this.ctx.clearRect(0, 0, this.width, this.height);
@@ -222,12 +226,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Inicialização inteligente adaptada por dispositivo
+  // Inicializa o background de texto interativo 2xa.studio na Hero
   new InteractiveTextBackground('hero-text-canvas', 'hero');
+
+  // Inicializa o background de texto interativo 2xa.studio na Seção CTA
   new InteractiveTextBackground('cta-text-canvas', 'contato');
 
   // --------------------------------------------------------------------------
-  // 2. REVELAÇÃO SUAVE DE ELEMENTOS (GSAP SCROLLTRIGGER)
+  // 2. REVELAÇÃO SUAVE DE ELEMENTOS (GSAP SCROLLTRIGGER OTIMIZADO)
   // --------------------------------------------------------------------------
   if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
     gsap.registerPlugin(ScrollTrigger);
@@ -236,12 +242,12 @@ document.addEventListener('DOMContentLoaded', () => {
       gsap.from(card, {
         scrollTrigger: {
           trigger: card,
-          start: 'top 88%',
+          start: 'top 92%',
           toggleActions: 'play none none none'
         },
         opacity: 0,
-        y: 25,
-        duration: 0.8,
+        y: 20,
+        duration: 0.6,
         ease: 'power2.out'
       });
     });

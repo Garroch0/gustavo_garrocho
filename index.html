@@ -6,7 +6,7 @@
   <title>Gustavo Garrocho — Designer & Estrategista de Marca</title>
   
   <!-- Favicon Oficial GG. (Imagem 2) -->
-  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=25">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=35">
   
   <!-- Meta Tags Principais & SEO -->
   <meta name="description" content="Gustavo Garrocho — Designer & Estrategista de Marca. Criação de identidades visuais, estratégia de marca, web design, gestão de anúncios e embalagens.">
@@ -21,28 +21,30 @@
   <meta property="og:url" content="https://gustavogarrocho.com.br/">
   <meta property="og:title" content="Gustavo Garrocho — Designer & Estrategista de Marca">
   <meta property="og:description" content="Crio marcas com conceito, impacto e consistência. Conheça nossos serviços, projetos e metodologia de trabalho.">
-  <meta property="og:image" content="src/assets/img/gustavo-garrocho.jpg">
+  <meta property="og:image" content="src/assets/img/gustavo-garrocho.webp">
 
   <!-- Twitter Cards -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Gustavo Garrocho — Designer & Estrategista de Marca">
   <meta name="twitter:description" content="Crio marcas com conceito, impacto e consistência.">
-  <meta name="twitter:image" content="src/assets/img/gustavo-garrocho.jpg">
+  <meta name="twitter:image" content="src/assets/img/gustavo-garrocho.webp">
   
-  <!-- Pré-conexão & Preload Otimizado para LCP Instantâneo -->
+  <!-- Preload da Imagem Principal em WebP (Otimização LCP Ultra Alta Velocidade) -->
+  <link rel="preload" as="image" href="src/assets/img/gustavo-garrocho.webp" type="image/webp">
+
+  <!-- Pré-conexão Otimizada para Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preload" as="image" href="src/assets/img/gustavo-garrocho.jpg" type="image/jpeg" fetchpriority="high">
   <link rel="dns-prefetch" href="https://api.rss2json.com">
 
   <!-- Google Fonts: Antonio (Condensed H1/H2), DM Sans (Body), Space Mono com font-display=swap -->
   <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@700&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
   
   <!-- Estilos Core Locais (0ms de Latência Externa) -->
-  <link rel="stylesheet" href="src/css/vendor/lenis.css?v=25">
-  <link rel="stylesheet" href="src/css/reset.css?v=25">
-  <link rel="stylesheet" href="src/css/variables.css?v=25">
-  <link rel="stylesheet" href="src/css/main.css?v=25">
+  <link rel="stylesheet" href="src/css/vendor/lenis.css?v=35">
+  <link rel="stylesheet" href="src/css/reset.css?v=35">
+  <link rel="stylesheet" href="src/css/variables.css?v=35">
+  <link rel="stylesheet" href="src/css/main.css?v=35">
 
   <!-- Dados Estruturados JSON-LD (Schema.org SEO) -->
   <script type="application/ld+json">
@@ -153,9 +155,12 @@
           </div>
         </div>
         
-        <!-- Coluna da Foto Oficial à Direita (Otimização LCP Alta Velocidade) -->
+        <!-- Coluna da Foto Oficial à Direita (Otimizada em WebP com Fallback JPG) -->
         <div class="about-image-container">
-          <img src="src/assets/img/gustavo-garrocho.jpg" alt="Gustavo Garrocho — Designer e Estrategista de Marca" class="about-photo" loading="eager" fetchpriority="high" decoding="async" width="600" height="720" />
+          <picture>
+            <source srcset="src/assets/img/gustavo-garrocho.webp" type="image/webp">
+            <img src="src/assets/img/gustavo-garrocho.jpg" alt="Gustavo Garrocho — Designer e Estrategista de Marca" class="about-photo" loading="eager" fetchpriority="high" decoding="async" width="600" height="720" />
+          </picture>
         </div>
       </div>
     </section>
@@ -270,7 +275,7 @@
           </div>
         </div>
 
-        <!-- Card 4.4: SITES (NOME ATUALIZADO) -->
+        <!-- Card 4.4: SITES -->
         <div class="bento-card card-standard bento-third">
           <div>
             <span class="card-num">04.4</span>
@@ -298,7 +303,7 @@
           </div>
         </div>
 
-        <!-- Card 4.7: Entregáveis Institucionais (Padronizado sem borda extra) -->
+        <!-- Card 4.7: Entregáveis Institucionais -->
         <div class="bento-card card-standard bento-half">
           <div>
             <span class="card-num">04.7</span>
@@ -348,10 +353,10 @@
   <script src="src/js/vendor/gsap.min.js" defer></script>
   <script src="src/js/vendor/ScrollTrigger.min.js" defer></script>
 
-  <!-- Scripts da Aplicação com Cache-Busting v=38 -->
-  <script src="src/js/analytics.js?v=38" defer></script>
-  <script src="src/js/app.js?v=38" defer></script>
-  <script src="src/js/behance-integration.js?v=38" defer></script>
-  <script src="src/js/animations.js?v=38" defer></script>
+  <!-- Scripts da Aplicação com Cache-Busting v=35 -->
+  <script src="src/js/analytics.js?v=35" defer></script>
+  <script src="src/js/app.js?v=35" defer></script>
+  <script src="src/js/behance-integration.js?v=35" defer></script>
+  <script src="src/js/animations.js?v=35" defer></script>
 </body>
 </html>

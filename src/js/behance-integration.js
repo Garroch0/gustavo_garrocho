@@ -1,6 +1,10 @@
 /**
- * Gustavo Garrocho — Sincronização Oficial de Projetos do Behance
- * Restrito Exclusivamente a 2 Cases Reais: Okay Company & Arquitetura Invicto
+ * Gustavo Garrocho — Sincronização Oficial dos 2 Projetos Selecionados do Behance
+ * Perfil: https://www.behance.net/Garrocho
+ * 
+ * Case 1: Okay Company — Rebrand Identity (https://www.behance.net/gallery/246089501/Okay-Company-Rebrand-Identity)
+ * Case 2: Arquitetura Invicto — Site profissional (https://www.behance.net/gallery/251530349/Arquitetura-Invicto-Site-profissional)
+ * 
  * DPOS 2026
  */
 
@@ -8,41 +12,38 @@ document.addEventListener('DOMContentLoaded', () => {
   const container = document.getElementById('projetos-container');
   if (!container) return;
 
-  const BEHANCE_USERNAME = 'Garrocho';
-  const RSS_FEED_URL = `https://www.behance.net/feeds/user?username=${BEHANCE_USERNAME}`;
-  const RSS2JSON_API = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(RSS_FEED_URL)}`;
-
-  // Projetos Alvo Oficiais
-  const TARGET_CASES = [
+  // Lista dos 2 Projetos Oficiais Solicitados
+  const behanceProjects = [
     {
-      keywords: ['okay', 'company', 'rebrand'],
-      customTitle: "OKAY COMPANY — REBRAND IDENTITY",
-      customCategory: "IDENTIDADE VISUAL & ESTRATÉGIA DE MARCA",
-      customDesc: "Rebranding completo para a Okay Company, articulando um novo ecossistema visual, posicionamento de mercado e linguagem verbal consistente.",
-      fallbackLink: "https://www.behance.net/gallery/246089501/Okay-Company-Rebrand-Identity",
-      fallbackCover: "https://mir-s3-cdn-cf.behance.net/projects/max_808/79b4a4246089501.Y3JvcCw5OTksNzgxLDAsMTA4.png"
+      num: '01',
+      title: 'OKAY COMPANY — REBRAND IDENTITY',
+      category: 'REBRANDING // IDENTIDADE VISUAL // BRANDING',
+      desc: 'Projeto autoral de rebranding e posicionamento estratégico da marca Okay Company, desenvolvido para gerar consistência, impacto e clareza de mercado.',
+      coverImg: 'https://mir-s3-cdn-cf.behance.net/project_modules/1400/49711d246089501.69bbe41f9560f.png',
+      link: 'https://www.behance.net/gallery/246089501/Okay-Company-Rebrand-Identity'
     },
     {
-      keywords: ['invicto', 'arquitetura', 'profissional'],
-      customTitle: "ARQUITETURA INVICTO — SITE PROFISSIONAL",
-      customCategory: "WEB DESIGN & PRESENÇA DIGITAL",
-      customDesc: "Plataforma digital institucional para o escritório Arquitetura Invicto, conectando sofisticação estética, portfólio de obras e arquitetura de informação otimizada.",
-      fallbackLink: "https://www.behance.net/gallery/251530349/Arquitetura-Invicto-Site-profissional",
-      fallbackCover: "https://mir-s3-cdn-cf.behance.net/projects/max_808/007fa7251530349.Y3JvcCwzMjc1LDI1NjIsMCwzNTY.png"
+      num: '02',
+      title: 'ARQUITETURA INVICTO — SITE PROFISSIONAL',
+      category: 'WEB DESIGN // UI/UX // SITE PROFISSIONAL',
+      desc: 'Desenvolvimento de site portfólio de alta performance e interface visual para o estúdio de arquitetura Invicto.',
+      coverImg: 'https://mir-s3-cdn-cf.behance.net/projects/max_808/26ec1e251530349.Y3JvcCwyMjgwLDE3ODMsMCw2Nw.png',
+      link: 'https://www.behance.net/gallery/251530349/Arquitetura-Invicto-Site-profissional'
     }
   ];
 
-  function extractImageFromContent(content) {
-    if (!content) return null;
-    const imgRegex = /<img[^>]+src=["']([^"']+)["']/i;
-    const match = content.match(imgRegex);
-    return match ? match[1] : null;
-  }
+  renderProjects(behanceProjects);
 
-  function renderProjectsList(projects) {
-    container.innerHTML = projects.map(proj => `
-      <article class="project-card interactive-card">
-        <div class="project-content">
+  function renderProjects(list) {
+    container.innerHTML = '';
+    
+    list.forEach((proj) => {
+      const card = document.createElement('article');
+      card.className = 'project-card interactive-project';
+      
+      card.innerHTML = `
+        <div class="project-info">
+          <span class="mono-badge text-dark-badge">BEHANCE PORTFÓLIO // ${proj.num}</span>
           <h3 class="project-title">${proj.title}</h3>
           <p class="project-category-text"><strong>CATEGORIA:</strong> ${proj.category}</p>
           <p class="project-desc">${proj.desc}</p>
@@ -51,61 +52,11 @@ document.addEventListener('DOMContentLoaded', () => {
           </a>
         </div>
         <div class="project-image-container">
-          <img src="${proj.image}" alt="${proj.title}" class="project-cover-image" loading="lazy" decoding="async" />
+          <img src="${proj.coverImg}" alt="${proj.title}" class="project-behance-img" loading="lazy" decoding="async" width="800" height="500" />
         </div>
-      </article>
-    `).join('');
-  }
-
-  // Tenta buscar as imagens dinâmicas do Behance, com fallback instantâneo perfeito
-  fetch(RSS2JSON_API)
-    .then(res => res.json())
-    .then(data => {
-      if (data.status === 'ok' && data.items && data.items.length > 0) {
-        const matched = [];
-
-        TARGET_CASES.forEach(target => {
-          const item = data.items.find(i => {
-            const t = (i.title || '').toLowerCase();
-            return target.keywords.every(kw => t.includes(kw));
-          });
-
-          if (item) {
-            const extractedImg = extractImageFromContent(item.content) || item.thumbnail || target.fallbackCover;
-            matched.push({
-              title: target.customTitle,
-              category: target.customCategory,
-              desc: target.customDesc,
-              link: item.link || target.fallbackLink,
-              image: extractedImg
-            });
-          } else {
-            matched.push({
-              title: target.customTitle,
-              category: target.customCategory,
-              desc: target.customDesc,
-              link: target.fallbackLink,
-              image: target.fallbackCover
-            });
-          }
-        });
-
-        renderProjectsList(matched);
-      } else {
-        renderFallback();
-      }
-    })
-    .catch(() => {
-      renderFallback();
+      `;
+      
+      container.appendChild(card);
     });
-
-  function renderFallback() {
-    renderProjectsList(TARGET_CASES.map(t => ({
-      title: t.customTitle,
-      category: t.customCategory,
-      desc: t.customDesc,
-      link: t.fallbackLink,
-      image: t.fallbackCover
-    })));
   }
 });
