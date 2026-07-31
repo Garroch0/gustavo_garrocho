@@ -733,13 +733,14 @@ p,
 .cta-section {
   padding: 8rem 5%;
   text-align: center;
-  background-color: var(--color-carbono);
+  background-color: var(--color-carbono-deep);
   border-top: var(--border-width) solid var(--border-color);
+  border-bottom: var(--border-width) solid var(--border-color);
   position: relative;
   overflow: hidden;
 }
 
-/* Background de Texto Interativo na Seção CTA */
+/* Background de Texto Interativo na Seção CTA (Identico ao Hero) */
 .cta-text-bg-container {
   position: absolute;
   top: 0;
