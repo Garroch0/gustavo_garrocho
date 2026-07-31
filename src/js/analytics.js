@@ -1,80 +1,53 @@
 /**
- * Gustavo Garrocho — Módulo de Analytics & Tráfego Pago (Meta Pixel)
+ * Gustavo Garrocho — Rastreamento de Analytics (Meta Ads & Microsoft Clarity)
+ * Meta Pixel ID Oficial: 2804627116587586
  * DPOS 2026
  */
 
-const ANALYTICS_CONFIG = {
-  META_PIXEL_ID: '', // Inserir o ID do Meta Pixel aqui
-  GTM_ID: ''          // Inserir o ID do Google Tag Manager aqui (opcional)
-};
+const META_PIXEL_ID = '2804627116587586'; // Pixel oficial do Meta Ads
+const CLARITY_PROJECT_ID = 'SEU_CLARITY_ID_AQUI'; // Insira aqui seu ID do Microsoft Clarity (ex: 'abcde12345')
 
-// Inicialização segura dos scripts de rastreamento
-(function initAnalytics() {
-  // Evitar execução se IDs não estiverem preenchidos
-  if (!ANALYTICS_CONFIG.META_PIXEL_ID && !ANALYTICS_CONFIG.GTM_ID) {
-    console.log('Rastreamento (Meta Pixel / GTM) aguardando inserção de IDs no arquivo analytics.js');
-    return;
-  }
-
-  // 1. INICIALIZAÇÃO META PIXEL
-  if (ANALYTICS_CONFIG.META_PIXEL_ID) {
-    (function(f,b,e,v,n,t,s) {
-      if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-      n.queue=[];t=b.createElement(e);t.async=!0;
-      t.src=v;s=b.getElementsByTagName(e)[0];
-      s.parentNode.insertBefore(t,s)
-    })(window, document,'script','https://connect.facebook.net/en_US/fbevents.js');
-    
-    fbq('init', ANALYTICS_CONFIG.META_PIXEL_ID);
-    fbq('track', 'PageView');
-    console.log('Meta Pixel inicializado.');
-  }
-
-  // 2. INICIALIZAÇÃO GTM
-  if (ANALYTICS_CONFIG.GTM_ID) {
-    (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer',ANALYTICS_CONFIG.GTM_ID);
-    console.log('GTM inicializado.');
-  }
-})();
-
-// Função utilitária para rastreamento de eventos personalizados
-function trackCustomEvent(eventName, params = {}) {
-  // Rastrear no Facebook
-  if (window.fbq && ANALYTICS_CONFIG.META_PIXEL_ID) {
-    window.fbq('trackCustom', eventName, params);
-  }
-  
-  // Rastrear no DataLayer (GTM)
-  if (window.dataLayer) {
-    window.dataLayer.push({
-      event: eventName,
-      eventParams: params
-    });
-  }
-}
-
-// Configurar escuta para rastreamento do clique no CTA do WhatsApp
 document.addEventListener('DOMContentLoaded', () => {
-  const ctaButtons = [
-    document.getElementById('whatsapp-link-btn'),
-    document.getElementById('hero-cta-btn'),
-    document.getElementById('header-cta-btn')
-  ];
-  
-  ctaButtons.forEach(btn => {
-    if (btn) {
-      btn.addEventListener('click', () => {
-        trackCustomEvent('WhatsAppClick', {
-          buttonId: btn.id,
-          timestamp: new Date().toISOString()
+
+  // 1. INICIALIZAÇÃO DO META PIXEL (FACEBOOK ADS)
+  if (META_PIXEL_ID) {
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/pt_BR/fbevents.js');
+
+    fbq('init', META_PIXEL_ID);
+    fbq('track', 'PageView');
+  }
+
+  // 2. INICIALIZAÇÃO DO MICROSOFT CLARITY (HEATMAPS & GRAVAÇÕES DE SESSÃO)
+  if (CLARITY_PROJECT_ID && CLARITY_PROJECT_ID !== 'SEU_CLARITY_ID_AQUI') {
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", CLARITY_PROJECT_ID);
+  }
+
+  // 3. DISPARO DO EVENTO DE CONVERSÃO 'Contact' EM TODOS OS BOTÕES DE WHATSAPP
+  const whatsappButtons = document.querySelectorAll(
+    'a[href*="wa.me"], a[href*="whatsapp.com"], #whatsapp-link-btn, #hero-cta-btn, #header-cta-btn, .btn-about-cta'
+  );
+
+  whatsappButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      // Dispara o evento de Contato no Meta Pixel
+      if (typeof fbq === 'function') {
+        fbq('track', 'Contact', {
+          content_name: 'Clique Botão WhatsApp',
+          content_category: 'Lead Conversão',
+          destination_url: btn.getAttribute('href')
         });
-      });
-    }
+      }
+    });
   });
 });
