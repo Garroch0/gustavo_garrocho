@@ -550,23 +550,21 @@ h1, h2, h3, h4 {
 }
 
 .project-image-container {
-  overflow: hidden;
-  position: relative;
   width: 100%;
   height: 100%;
-  min-height: 290px;
-  max-height: 310px;
-  background-color: #EAEAEA;
+  min-height: 280px;
+  overflow: hidden;
+  background-color: var(--color-carbono-deep);
+  position: relative;
 }
 
-.project-behance-img {
+.project-cover-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  min-height: 290px;
-  max-height: 310px;
+  object-position: center;
   display: block;
-  transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
   will-change: transform;
 }
 
