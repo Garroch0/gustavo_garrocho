@@ -1,13 +1,13 @@
 /**
  * Gustavo Garrocho — Motor de Texto Interativo 2xa.studio
- * Otimização Ultra-Performática para Mobile (IntersectionObserver + Particle Throttling)
+ * Desempenho Otimizado PageSpeed Mobile 95+ (Desktop 60fps / Mobile Ultra-Light)
  * DPOS 2026
  */
 
 document.addEventListener('DOMContentLoaded', () => {
 
   // --------------------------------------------------------------------------
-  // 1. MOTOR CANVAS 2D DE TEXTO INTERATIVO (PAUSA INTELIGENTE QUANDO FORA DA TELA)
+  // 1. MOTOR CANVAS 2D DE TEXTO INTERATIVO (DESKTOP 60FPS / MOBILE 0MS TBT)
   // --------------------------------------------------------------------------
   class InteractiveTextBackground {
     constructor(canvasId = 'hero-text-canvas', sectionId = 'hero') {
@@ -21,16 +21,15 @@ document.addEventListener('DOMContentLoaded', () => {
       this.rawText = `DRIVEN DESIGN STUDIO BETWEEN BRAND STRATEGY VISUAL IDENTITY DIGITIZATION PROCESSES SHAPED BY INPUT NO SINGLE OUTCOME IS TREATED AS FINAL SYSTEMATICS UNFOLD THROUGH DEPENDENCY AND ITERATION EACH STATE EMERGES FROM PREVIOUS CONDITIONS AND INFLUENCES WHAT FOLLOWS CHANGE IS NOT AN EFFECT APPLIED AFTERWARD BUT AN INHERENT PROPERTY OF THE SYSTEM COMPUTATIONAL DESIGN DRAWS INPUT FROM EXISTING CONDITIONS INCLUDING MACHINE PROCESSES HUMAN INTENTIONS AND BRAND STRATEGY `;
 
       this.particles = [];
-      this.mouse = { x: -9999, y: -9999, radius: 200, active: false };
+      this.mouse = { x: -9999, y: -9999, radius: 240, active: false };
       this.time = 0;
       this.isIntersecting = false;
       this.animationFrameId = null;
 
-      // Responsividade de Densidade (Em mobile reduz o peso de processamento para 100 em PageSpeed)
-      const isMobile = window.innerWidth < 768;
-      this.fontSize = isMobile ? 14 : 13;
-      this.lineHeight = isMobile ? 26 : 21;
-      this.letterSpacing = isMobile ? 18 : 11;
+      this.isMobile = window.innerWidth <= 768;
+      this.fontSize = this.isMobile ? 14 : 13;
+      this.lineHeight = this.isMobile ? 24 : 21;
+      this.letterSpacing = this.isMobile ? 16 : 11;
 
       if (document.fonts) {
         document.fonts.ready.then(() => this.init());
@@ -42,11 +41,17 @@ document.addEventListener('DOMContentLoaded', () => {
     init() {
       this.resize();
       this.bindEvents();
-      this.setupObserver();
+
+      if (this.isMobile) {
+        // No Mobile: Renderiza os caracteres estaticamente apenas 1 vez (0ms TBT de CPU)
+        this.renderStatic();
+      } else {
+        // No Desktop: Ativa o monitoramento por IntersectionObserver e o loop 60fps
+        this.setupObserver();
+      }
     }
 
     setupObserver() {
-      // IntersectionObserver: PAUSA o canvas completamente quando a seção sai da tela do usuário
       const observer = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
           this.isIntersecting = entry.isIntersecting;
@@ -72,24 +77,26 @@ document.addEventListener('DOMContentLoaded', () => {
       this.width = rect.width;
       this.height = rect.height;
 
-      const dpr = Math.min(window.devicePixelRatio || 1, 1.5); // Limita DPR a 1.5 no mobile
+      const dpr = Math.min(window.devicePixelRatio || 1, this.isMobile ? 1 : 1.5);
       this.canvas.width = this.width * dpr;
       this.canvas.height = this.height * dpr;
       this.ctx.scale(dpr, dpr);
 
       this.createParticles();
+      if (this.isMobile) {
+        this.renderStatic();
+      }
     }
 
     createParticles() {
       this.particles = [];
-
       const cols = Math.floor(this.width / this.letterSpacing) + 4;
       const rows = Math.floor(this.height / this.lineHeight) + 2;
       const textLength = this.rawText.length;
 
       for (let r = 0; r < rows; r++) {
-        const direction = r % 2 === 0 ? 0.35 : -0.35;
-        let textOffset = (r * 12) % textLength;
+        const direction = r % 2 === 0 ? 0.45 : -0.45;
+        let textOffset = (r * 15) % textLength;
 
         for (let c = 0; c < cols; c++) {
           const char = this.rawText[(textOffset + c) % textLength];
@@ -107,7 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
             originY: originY,
             row: r,
             direction: direction,
-            density: (Math.random() * 18) + 10
+            density: (Math.random() * 25) + 15
           });
         }
       }
@@ -116,49 +123,45 @@ document.addEventListener('DOMContentLoaded', () => {
     bindEvents() {
       window.addEventListener('resize', () => this.resize());
 
-      window.addEventListener('mousemove', (e) => {
-        if (!this.heroSection || !this.isIntersecting) return;
-        const rect = this.heroSection.getBoundingClientRect();
-        
-        if (
-          e.clientX >= rect.left &&
-          e.clientX <= rect.right &&
-          e.clientY >= rect.top &&
-          e.clientY <= rect.bottom
-        ) {
-          this.mouse.x = e.clientX - rect.left;
-          this.mouse.y = e.clientY - rect.top;
-          this.mouse.active = true;
-        } else {
-          this.mouse.active = false;
-        }
-      });
+      if (!this.isMobile) {
+        window.addEventListener('mousemove', (e) => {
+          if (!this.heroSection || !this.isIntersecting) return;
+          const rect = this.heroSection.getBoundingClientRect();
+          
+          if (
+            e.clientX >= rect.left &&
+            e.clientX <= rect.right &&
+            e.clientY >= rect.top &&
+            e.clientY <= rect.bottom
+          ) {
+            this.mouse.x = e.clientX - rect.left;
+            this.mouse.y = e.clientY - rect.top;
+            this.mouse.active = true;
+          } else {
+            this.mouse.active = false;
+          }
+        });
+      }
+    }
 
-      window.addEventListener('touchmove', (e) => {
-        if (!this.heroSection || !this.isIntersecting || e.touches.length === 0) return;
-        const rect = this.heroSection.getBoundingClientRect();
-        const touch = e.touches[0];
+    renderStatic() {
+      this.ctx.clearRect(0, 0, this.width, this.height);
+      this.ctx.font = `${this.fontSize}px "Space Mono", monospace`;
+      this.ctx.fillStyle = 'rgba(242, 242, 242, 0.28)';
 
-        if (
-          touch.clientX >= rect.left &&
-          touch.clientX <= rect.right &&
-          touch.clientY >= rect.top &&
-          touch.clientY <= rect.bottom
-        ) {
-          this.mouse.x = touch.clientX - rect.left;
-          this.mouse.y = touch.clientY - rect.top;
-          this.mouse.active = true;
-        }
-      }, { passive: true });
+      for (let i = 0; i < this.particles.length; i++) {
+        const p = this.particles[i];
+        this.ctx.fillText(p.char, p.originX, p.originY);
+      }
     }
 
     animate() {
-      if (!this.isIntersecting) {
+      if (!this.isIntersecting || this.isMobile) {
         this.animationFrameId = null;
         return;
       }
 
-      this.time += 0.02;
+      this.time += 0.025;
       this.ctx.clearRect(0, 0, this.width, this.height);
       this.ctx.font = `${this.fontSize}px "Space Mono", monospace`;
 
@@ -167,10 +170,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         p.originX += p.direction;
 
-        if (p.originX > this.width + this.letterSpacing) {
-          p.originX = -this.letterSpacing;
-        } else if (p.originX < -this.letterSpacing) {
-          p.originX = this.width + this.letterSpacing;
+        if (p.originX > this.width + this.letterSpacing * 2) {
+          p.originX = -this.letterSpacing * 2;
+        } else if (p.originX < -this.letterSpacing * 2) {
+          p.originX = this.width + this.letterSpacing * 2;
         }
 
         const idleTargetX = p.originX;
@@ -190,7 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
           const forceDirectionX = dx / (distance || 1);
           const forceDirectionY = dy / (distance || 1);
-          const force = proximity * p.density * 3.5;
+          const force = proximity * p.density * 4.8;
 
           targetX = idleTargetX - forceDirectionX * force;
           targetY = idleTargetY - forceDirectionY * force;
@@ -219,7 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Inicializa com monitoramento de visão para economizar CPU no mobile
+  // Inicialização inteligente adaptada por dispositivo
   new InteractiveTextBackground('hero-text-canvas', 'hero');
   new InteractiveTextBackground('cta-text-canvas', 'contato');
 
