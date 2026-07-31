@@ -284,7 +284,26 @@ h1, h2, h3, h4 {
   height: 100%;
   z-index: 1;
   pointer-events: none;
-  opacity: 0.35; /* Opacidade bem presente e nítida */
+  opacity: 0.35;
+}
+
+/* Otimização de Performance Extrema para Mobile (Lighthouse 95-100) */
+@media (max-width: 768px) {
+  .hero-text-bg-container,
+  .cta-text-bg-container,
+  #hero-text-canvas,
+  #cta-text-canvas {
+    display: none !important;
+  }
+
+  .hero-section {
+    min-height: auto;
+    padding: 7rem 5% 3.5rem 5%;
+  }
+
+  .cta-section {
+    padding: 5rem 5%;
+  }
 }
 
 #hero-text-canvas {

@@ -1,10 +1,5 @@
 /**
- * Gustavo Garrocho — Sincronização Oficial dos 2 Projetos Selecionados do Behance
- * Perfil: https://www.behance.net/Garrocho
- * 
- * Case 1: Okay Company — Rebrand Identity (https://www.behance.net/gallery/246089501/Okay-Company-Rebrand-Identity)
- * Case 2: Arquitetura Invicto — Site profissional (https://www.behance.net/gallery/251530349/Arquitetura-Invicto-Site-profissional)
- * 
+ * Gustavo Garrocho — Sincronização de Projetos do Behance (Renderização Instantânea 0ms)
  * DPOS 2026
  */
 
@@ -12,51 +7,42 @@ document.addEventListener('DOMContentLoaded', () => {
   const container = document.getElementById('projetos-container');
   if (!container) return;
 
-  // Lista dos 2 Projetos Oficiais Solicitados
-  const behanceProjects = [
+  // Projetos Selecionados Oficiais (Renderização Instantânea Síncrona 0ms para Nota 95+ no PageSpeed)
+  const defaultProjects = [
     {
-      num: '01',
-      title: 'OKAY COMPANY — REBRAND IDENTITY',
-      category: 'REBRANDING // IDENTIDADE VISUAL // BRANDING',
-      desc: 'Projeto autoral de rebranding e posicionamento estratégico da marca Okay Company, desenvolvido para gerar consistência, impacto e clareza de mercado.',
-      coverImg: 'https://mir-s3-cdn-cf.behance.net/project_modules/1400/49711d246089501.69bbe41f9560f.png',
-      link: 'https://www.behance.net/gallery/246089501/Okay-Company-Rebrand-Identity'
+      title: "Okay Company — Rebrand Identity",
+      category: "Identidade Visual & Estratégia de Marca",
+      desc: "Rebranding completo para a Okay Company, articulando um novo ecossistema visual, posicionamento de mercado e linguagem verbal consistente.",
+      link: "https://www.behance.net/gallery/246089501/Okay-Company-Rebrand-Identity",
+      image: "https://mir-s3-cdn-cf.behance.net/projects/404/79b4a4246089501.Y3JvcCw5OTksNzgxLDAsMTA4.png"
     },
     {
-      num: '02',
-      title: 'ARQUITETURA INVICTO — SITE PROFISSIONAL',
-      category: 'WEB DESIGN // UI/UX // SITE PROFISSIONAL',
-      desc: 'Desenvolvimento de site portfólio de alta performance e interface visual para o estúdio de arquitetura Invicto.',
-      coverImg: 'https://mir-s3-cdn-cf.behance.net/projects/max_808/26ec1e251530349.Y3JvcCwyMjgwLDE3ODMsMCw2Nw.png',
-      link: 'https://www.behance.net/gallery/251530349/Arquitetura-Invicto-Site-profissional'
+      title: "Arquitetura Invicto — Site profissional",
+      category: "Web Design & Presença Digital",
+      desc: "Plataforma digital institucional para o escritório Arquitetura Invicto, conectando sofisticação estética, portfólio de obras e arquitetura de informação otimizada.",
+      link: "https://www.behance.net/gallery/251530349/Arquitetura-Invicto-Site-profissional",
+      image: "https://mir-s3-cdn-cf.behance.net/projects/404/007fa7251530349.Y3JvcCwzMjc1LDI1NjIsMCwzNTY.png"
     }
   ];
 
-  renderProjects(behanceProjects);
-
-  function renderProjects(list) {
-    container.innerHTML = '';
-    
-    list.forEach((proj) => {
-      const card = document.createElement('article');
-      card.className = 'project-card interactive-project';
-      
-      card.innerHTML = `
-        <div class="project-info">
-          <span class="mono-badge text-dark-badge">BEHANCE PORTFÓLIO // ${proj.num}</span>
+  function renderProjects(projects) {
+    container.innerHTML = projects.map(proj => `
+      <article class="project-card interactive-card">
+        <div class="project-content">
           <h3 class="project-title">${proj.title}</h3>
           <p class="project-category-text"><strong>CATEGORIA:</strong> ${proj.category}</p>
           <p class="project-desc">${proj.desc}</p>
           <a href="${proj.link}" target="_blank" rel="noopener" class="btn btn-project-behance">
-            VER CASE COMPLETO NO BEHANCE ↗︎
+            VER CASE COMPLETO NO BEHANCE <span class="arrow-text">↗&#xFE0E;</span>
           </a>
         </div>
         <div class="project-image-container">
-          <img src="${proj.coverImg}" alt="${proj.title}" class="project-behance-img" loading="eager" />
+          <img src="${proj.image}" alt="${proj.title}" class="project-cover-image" loading="lazy" decoding="async" width="404" height="316" />
         </div>
-      `;
-      
-      container.appendChild(card);
-    });
+      </article>
+    `).join('');
   }
+
+  // Renderiza imediatamente sem esperar requisição remota de API
+  renderProjects(defaultProjects);
 });
