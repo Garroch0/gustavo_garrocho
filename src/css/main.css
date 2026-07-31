@@ -269,12 +269,13 @@ h1, h2, h3, h4 {
   display: flex;
   align-items: center;
   position: relative;
-  padding: 6rem 0 4rem;
-  background-color: var(--color-carbono);
+  padding: 8rem 5% 4rem 5%;
+  border-bottom: var(--border-width) solid var(--border-color);
+  background-color: var(--color-carbono-deep);
   overflow: hidden;
 }
 
-/* Background de Texto Interativo tipo 2xa.studio */
+/* Background de Texto Interativo tipo 2xa.studio (Sutil & Elegante) */
 .hero-text-bg-container {
   position: absolute;
   top: 0;
@@ -283,7 +284,7 @@ h1, h2, h3, h4 {
   height: 100%;
   z-index: 1;
   pointer-events: none;
-  opacity: 0.85;
+  opacity: 0.12; /* Opacidade sutil para legibilidade máxima da copy */
 }
 
 #hero-text-canvas {
@@ -297,7 +298,7 @@ h1, h2, h3, h4 {
   z-index: 2;
   width: 100%;
   max-width: 1200px;
-  width: 100%;
+  margin: 0 auto;
 }
 
 .hero-title {

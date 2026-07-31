@@ -1,12 +1,12 @@
 /**
- * Gustavo Garrocho — Motor de Texto Interativo tipo 2xa.studio (Alta Visibilidade & 60fps)
+ * Gustavo Garrocho — Motor de Texto Interativo tipo 2xa.studio (Subtil, Refinado & Legibilidade 100%)
  * DPOS 2026
  */
 
 document.addEventListener('DOMContentLoaded', () => {
 
   // --------------------------------------------------------------------------
-  // 1. MOTOR CANVAS 2D DE TEXTO INTERATIVO ESTILO 2XA.STUDIO
+  // 1. MOTOR CANVAS 2D DE TEXTO INTERATIVO ESTILO 2XA.STUDIO (SUBTIL & ELEGANTE)
   // --------------------------------------------------------------------------
   class InteractiveTextBackground {
     constructor() {
@@ -20,17 +20,17 @@ document.addEventListener('DOMContentLoaded', () => {
       this.rawText = `DRIVEN DESIGN STUDIO BETWEEN BRAND STRATEGY VISUAL IDENTITY DIGITIZATION PROCESSES SHAPED BY INPUT NO SINGLE OUTCOME IS TREATED AS FINAL SYSTEMATICS UNFOLD THROUGH DEPENDENCY AND ITERATION EACH STATE EMERGES FROM PREVIOUS CONDITIONS AND INFLUENCES WHAT FOLLOWS CHANGE IS NOT AN EFFECT APPLIED AFTERWARD BUT AN INHERENT PROPERTY OF THE SYSTEM COMPUTATIONAL DESIGN DRAWS INPUT FROM EXISTING CONDITIONS INCLUDING MACHINE PROCESSES HUMAN INTENTIONS AND BRAND STRATEGY`;
 
       this.particles = [];
-      this.mouse = { x: -9999, y: -9999, radius: 220, active: false };
+      this.mouse = { x: -9999, y: -9999, radius: 130, active: false }; // Raio harmonioso e discreto
 
-      this.fontSize = 14;
-      this.lineHeight = 22;
-      this.letterSpacing = 12;
+      this.fontSize = 13;
+      this.lineHeight = 21;
+      this.letterSpacing = 11;
 
-      // Inicialização garantida após o carregamento da fonte tipográfica
+      // Inicialização garantida após o carregamento completo da fonte tipográfica
       if (document.fonts) {
         document.fonts.ready.then(() => this.init());
       } else {
-        setTimeout(() => this.init(), 300);
+        setTimeout(() => this.init(), 200);
       }
     }
 
@@ -80,7 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
             originY: originY,
             vx: 0,
             vy: 0,
-            density: (Math.random() * 25) + 12
+            density: (Math.random() * 15) + 8
           });
         }
       }
@@ -89,12 +89,11 @@ document.addEventListener('DOMContentLoaded', () => {
     bindEvents() {
       window.addEventListener('resize', () => this.resize());
 
-      // Rastreamento global do movimento do mouse na Hero
+      // Rastreamento sutil do cursor do mouse
       window.addEventListener('mousemove', (e) => {
         if (!this.heroSection) return;
         const rect = this.heroSection.getBoundingClientRect();
         
-        // Verifica se o mouse está sobre a área da Hero
         if (
           e.clientX >= rect.left &&
           e.clientX <= rect.right &&
@@ -147,29 +146,29 @@ document.addEventListener('DOMContentLoaded', () => {
           const forceDirectionY = dy / distance;
           const maxDistance = this.mouse.radius;
           const force = (maxDistance - distance) / maxDistance;
-          const directionX = forceDirectionX * force * p.density * 2.5;
-          const directionY = forceDirectionY * force * p.density * 2.5;
+          const directionX = forceDirectionX * force * p.density * 1.2;
+          const directionY = forceDirectionY * force * p.density * 1.2;
 
-          // Dispersão do caractere ao aproximar o mouse
+          // Dispersão sutil e elegante
           p.x -= directionX;
           p.y -= directionY;
         } else {
           // Retorno elástico suave à posição de origem
           if (p.x !== p.originX) {
             const dxOrigin = p.originX - p.x;
-            p.x += dxOrigin * 0.1;
+            p.x += dxOrigin * 0.08;
           }
           if (p.y !== p.originY) {
             const dyOrigin = p.originY - p.y;
-            p.y += dyOrigin * 0.1;
+            p.y += dyOrigin * 0.08;
           }
         }
 
-        // Renderização com visibilidade e contraste alto
+        // Renderização com opacidade sutil de alta legibilidade
         if (isHovered) {
-          this.ctx.fillStyle = '#C7F032'; // Verde-Lima em destaque quando próximo ao cursor
+          this.ctx.fillStyle = 'rgba(199, 240, 50, 0.45)'; // Verde-Lima sutil em hover
         } else {
-          this.ctx.fillStyle = 'rgba(242, 242, 242, 0.45)'; // Off-White visível no fundo carbono
+          this.ctx.fillStyle = 'rgba(242, 242, 242, 0.22)'; // Off-white suave de marca d'água
         }
 
         this.ctx.fillText(p.char, p.x, p.y);
