@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Antonio:wght@700&amp;display=swap');
+      .favicon-bg { fill: #121413; }
+      .favicon-text {
+        font-family: 'Antonio', 'Arial Narrow', sans-serif;
+        font-weight: 700;
+        font-size: 260px;
+        letter-spacing: -10px;
+        fill: #F2F2F2;
+      }
+      .favicon-dot { fill: #C7F032; }
+    </style>
+  </defs>
+  <!-- Fundo Carbono Escuro -->
+  <rect class="favicon-bg" width="512" height="512" rx="96"/>
+  <!-- Texto GG com Antonio Bold Centralizado -->
+  <text x="225" y="340" class="favicon-text" text-anchor="middle">GG</text>
+  <!-- Ponto Final Verde-Lima -->
+  <circle class="favicon-dot" cx="395" cy="320" r="30"/>
+</svg>

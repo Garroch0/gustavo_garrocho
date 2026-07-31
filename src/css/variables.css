@@ -1,0 +1,31 @@
+/* Variáveis Globais do Design System (Tokens) */
+:root {
+  /* Cores Extraídas da Referência */
+  --color-carbono: #2B2B2B;
+  --color-carbono-deep: #121413;
+  --color-off-white: #F2F2F2;
+  --color-lima: #C7F032;
+  --color-lavanda: #C8C5E2;
+  --color-menta: #DCE8D9;
+  --color-azul: #3B3386;
+
+  /* Semântica de Cores (Definições Iniciais) */
+  --bg-primary: var(--color-carbono-deep);
+  --text-primary: var(--color-off-white);
+  --accent-color: var(--color-lima);
+
+  /* Tipografia */
+  --font-headings: 'Antonio', 'Oswald', 'Impact', sans-serif-condensed; /* Antonio e Oswald serão importadas via Google Fonts como fallbacks premium */
+  --font-body: 'DM Sans', sans-serif;
+  --font-mono: 'Space Mono', 'JetBrains Mono', monospace;
+
+  /* Espaçamentos e Dimensões */
+  --grid-gap: 1.5rem;
+  --border-width: 1px;
+  --border-color: rgba(242, 242, 242, 0.15); /* off-white com opacidade */
+  --border-color-dark: rgba(43, 43, 43, 0.15); /* carbono com opacidade */
+
+  /* Transições padrão */
+  --transition-smooth: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+  --transition-fast: all 0.2s ease-in-out;
+}
