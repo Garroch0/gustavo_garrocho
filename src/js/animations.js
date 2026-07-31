@@ -1,27 +1,27 @@
 /**
- * Gustavo Garrocho — Motor de Texto Interativo 2xa.studio
- * Repulsão Vetorial Intensificada + Brilho Verde-Lima Opaco Sólido sob o Cursor
+ * Gustavo Garrocho — Motor de Texto Interativo 2xa.studio (Hero + Seção CTA)
+ * Deslizamento por Linhas + Repulsão Vetorial Elástica + Opacidade Neon Verde-Lima
  * DPOS 2026
  */
 
 document.addEventListener('DOMContentLoaded', () => {
 
   // --------------------------------------------------------------------------
-  // 1. MOTOR CANVAS 2D DE TEXTO INTERATIVO (2XA.STUDIO DISPERSÃO INTENSA)
+  // 1. MOTOR CANVAS 2D DE TEXTO INTERATIVO (REUTILIZÁVEL HERO & CTA)
   // --------------------------------------------------------------------------
   class InteractiveTextBackground {
-    constructor() {
-      this.canvas = document.getElementById('hero-text-canvas');
+    constructor(canvasId = 'hero-text-canvas', sectionId = 'hero') {
+      this.canvas = document.getElementById(canvasId);
       if (!this.canvas) return;
 
       this.ctx = this.canvas.getContext('2d');
-      this.heroSection = document.getElementById('hero');
+      this.heroSection = document.getElementById(sectionId);
 
       // Parágrafos de texto denso em estilo editorial/brutalista (2xa.studio)
       this.rawText = `DRIVEN DESIGN STUDIO BETWEEN BRAND STRATEGY VISUAL IDENTITY DIGITIZATION PROCESSES SHAPED BY INPUT NO SINGLE OUTCOME IS TREATED AS FINAL SYSTEMATICS UNFOLD THROUGH DEPENDENCY AND ITERATION EACH STATE EMERGES FROM PREVIOUS CONDITIONS AND INFLUENCES WHAT FOLLOWS CHANGE IS NOT AN EFFECT APPLIED AFTERWARD BUT AN INHERENT PROPERTY OF THE SYSTEM COMPUTATIONAL DESIGN DRAWS INPUT FROM EXISTING CONDITIONS INCLUDING MACHINE PROCESSES HUMAN INTENTIONS AND BRAND STRATEGY `;
 
       this.particles = [];
-      this.mouse = { x: -9999, y: -9999, radius: 240, active: false }; // Raio amplo de 240px
+      this.mouse = { x: -9999, y: -9999, radius: 240, active: false };
       this.time = 0;
 
       this.fontSize = 13;
@@ -66,7 +66,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const textLength = this.rawText.length;
 
       for (let r = 0; r < rows; r++) {
-        // Alterna a direção da linha: pares para a direita (+0.45), ímpares para a esquerda (-0.45)
         const direction = r % 2 === 0 ? 0.45 : -0.45;
         this.lineSpeeds.push(direction);
 
@@ -88,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
             originY: originY,
             row: r,
             direction: direction,
-            density: (Math.random() * 25) + 15 // Densidade de repulsão ampliada
+            density: (Math.random() * 25) + 15
           });
         }
       }
@@ -141,10 +140,8 @@ document.addEventListener('DOMContentLoaded', () => {
       for (let i = 0; i < this.particles.length; i++) {
         const p = this.particles[i];
 
-        // 1. Deslizamento Contínuo Infinito da Linha (Esquerda / Direita)
         p.originX += p.direction;
 
-        // Loop Infinito do Caractere
         if (p.originX > this.width + this.letterSpacing * 2) {
           p.originX = -this.letterSpacing * 2;
         } else if (p.originX < -this.letterSpacing * 2) {
@@ -154,7 +151,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const idleTargetX = p.originX;
         const idleTargetY = p.originY;
 
-        // 2. Repulsão Vetorial Elástica Intensificada (2xa.studio) + Opacidade Neon Verde-Lima
         const dx = this.mouse.x - p.x;
         const dy = this.mouse.y - p.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
@@ -165,33 +161,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (distance < this.mouse.radius && this.mouse.active) {
           isHovered = true;
-          const proximity = (this.mouse.radius - distance) / this.mouse.radius; // 0 a 1
+          const proximity = (this.mouse.radius - distance) / this.mouse.radius;
 
-          // Repulsão vetorial 2x mais forte e expansiva
           const forceDirectionX = dx / (distance || 1);
           const forceDirectionY = dy / (distance || 1);
-          const force = proximity * p.density * 4.8; 
+          const force = proximity * p.density * 4.8;
 
           targetX = idleTargetX - forceDirectionX * force;
           targetY = idleTargetY - forceDirectionY * force;
         }
 
-        // Interpolação suave em 60fps
         p.x += (targetX - p.x) * 0.14;
         p.y += (targetY - p.y) * 0.14;
 
-        // Renderização com Verde-Lima 100% Opaco Sólido e Intenso no Cursor
         if (isHovered) {
           const proximity = (this.mouse.radius - distance) / this.mouse.radius;
-          const alpha = 0.35 + (proximity * 0.65); // Opacidade vai de 0.35 até 1.0 sólido!
+          const alpha = 0.35 + (proximity * 0.65);
 
           if (proximity > 0.30) {
-            this.ctx.fillStyle = `rgba(199, 240, 50, ${alpha.toFixed(2)})`; // Verde-Lima radiante sólido
+            this.ctx.fillStyle = `rgba(199, 240, 50, ${alpha.toFixed(2)})`;
           } else {
-            this.ctx.fillStyle = `rgba(242, 242, 242, ${alpha.toFixed(2)})`; // Off-White na borda
+            this.ctx.fillStyle = `rgba(242, 242, 242, ${alpha.toFixed(2)})`;
           }
         } else {
-          this.ctx.fillStyle = 'rgba(242, 242, 242, 0.35)'; // Off-White visível em repouso
+          this.ctx.fillStyle = 'rgba(242, 242, 242, 0.35)';
         }
 
         this.ctx.fillText(p.char, p.x, p.y);
@@ -201,8 +194,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Inicializa o background de texto interativo 2xa.studio
-  new InteractiveTextBackground();
+  // Inicializa o background de texto interativo 2xa.studio na Hero
+  new InteractiveTextBackground('hero-text-canvas', 'hero');
+
+  // Inicializa o background de texto interativo 2xa.studio na Seção CTA
+  new InteractiveTextBackground('cta-text-canvas', 'contato');
 
   // --------------------------------------------------------------------------
   // 2. REVELAÇÃO SUAVE DE ELEMENTOS (GSAP SCROLLTRIGGER)
