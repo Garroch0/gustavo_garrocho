@@ -6,7 +6,7 @@
   <title>Gustavo Garrocho — Designer & Estrategista de Marca</title>
   
   <!-- Favicon Oficial GG. (Imagem 2) -->
-  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=38">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=39">
   
   <!-- Meta Tags Principais & SEO -->
   <meta name="description" content="Gustavo Garrocho — Designer & Estrategista de Marca. Criação de identidades visuais, estratégia de marca, web design, gestão de anúncios e embalagens.">
@@ -30,7 +30,8 @@
   <meta name="twitter:image" content="src/assets/img/gustavo-garrocho.webp">
   
   <!-- Preload da Imagem Principal em WebP (Otimização LCP Ultra Alta Velocidade) -->
-  <link rel="preload" as="image" href="src/assets/img/gustavo-garrocho.webp" type="image/webp">
+  <link rel="preload" as="image" href="src/assets/img/gustavo-garrocho-mobile.webp" type="image/webp" media="(max-width: 767px)">
+  <link rel="preload" as="image" href="src/assets/img/gustavo-garrocho.webp" type="image/webp" media="(min-width: 768px)">
 
   <!-- Pré-conexão Otimizada para Google Fonts & Fontes -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -41,10 +42,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@700&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
   
   <!-- Estilos Core Locais Não-Bloqueantes (Elimina 1.320ms de Render-Blocking no PageSpeed) -->
-  <link rel="stylesheet" href="src/css/reset.css?v=38">
-  <link rel="stylesheet" href="src/css/variables.css?v=38">
-  <link rel="stylesheet" href="src/css/main.css?v=38">
-  <link rel="stylesheet" href="src/css/vendor/lenis.css?v=38" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="src/css/reset.css?v=39">
+  <link rel="stylesheet" href="src/css/variables.css?v=39">
+  <link rel="stylesheet" href="src/css/main.css?v=39">
+  <link rel="stylesheet" href="src/css/vendor/lenis.css?v=39" media="print" onload="this.media='all'">
 
   <!-- Dados Estruturados JSON-LD (Schema.org SEO) -->
   <script type="application/ld+json">
@@ -155,11 +156,12 @@
           </div>
         </div>
         
-        <!-- Coluna da Foto Oficial à Direita (Otimizada em WebP com Fallback JPG) -->
+        <!-- Coluna da Foto Oficial à Direita (Otimizada em WebP Responsivo 42KB para Mobile) -->
         <div class="about-image-container">
           <picture>
-            <source srcset="src/assets/img/gustavo-garrocho.webp" type="image/webp">
-            <img src="src/assets/img/gustavo-garrocho.jpg" alt="Gustavo Garrocho — Designer e Estrategista de Marca" class="about-photo" loading="eager" fetchpriority="high" decoding="async" width="600" height="720" />
+            <source media="(max-width: 767px)" srcset="src/assets/img/gustavo-garrocho-mobile.webp" type="image/webp">
+            <source media="(min-width: 768px)" srcset="src/assets/img/gustavo-garrocho.webp" type="image/webp">
+            <img src="src/assets/img/gustavo-garrocho.webp" alt="Gustavo Garrocho — Designer e Estrategista de Marca" class="about-photo" loading="lazy" decoding="async" width="600" height="390" />
           </picture>
         </div>
       </div>
@@ -353,10 +355,10 @@
   <script src="src/js/vendor/gsap.min.js" defer></script>
   <script src="src/js/vendor/ScrollTrigger.min.js" defer></script>
 
-  <!-- Scripts da Aplicação com Cache-Busting v=38 -->
-  <script src="src/js/analytics.js?v=38" defer></script>
-  <script src="src/js/app.js?v=38" defer></script>
-  <script src="src/js/behance-integration.js?v=38" defer></script>
-  <script src="src/js/animations.js?v=38" defer></script>
+  <!-- Scripts da Aplicação com Cache-Busting v=39 -->
+  <script src="src/js/analytics.js?v=39" defer></script>
+  <script src="src/js/app.js?v=39" defer></script>
+  <script src="src/js/behance-integration.js?v=39" defer></script>
+  <script src="src/js/animations.js?v=39" defer></script>
 </body>
 </html>

@@ -1,13 +1,13 @@
 /**
  * Gustavo Garrocho — Motor de Texto Interativo 2xa.studio
- * Otimizado com Retentores de Layout Cache (0ms Reflow Forçado) e IntersectionObserver
+ * Otimizado contra Long Tasks e Reflow Forçado (0ms bloqueio na thread principal)
  * DPOS 2026
  */
 
 document.addEventListener('DOMContentLoaded', () => {
 
   // --------------------------------------------------------------------------
-  // 1. MOTOR CANVAS 2D DE TEXTO INTERATIVO (REUTILIZÁVEL HERO & CTA - ZERO REFLOW)
+  // 1. MOTOR CANVAS 2D DE TEXTO INTERATIVO (DIFERIDO CONTRA LONG TASKS)
   // --------------------------------------------------------------------------
   class InteractiveTextBackground {
     constructor(canvasId = 'hero-text-canvas', sectionId = 'hero') {
@@ -18,7 +18,6 @@ document.addEventListener('DOMContentLoaded', () => {
       this.heroSection = document.getElementById(sectionId);
       if (!this.heroSection) return;
 
-      // Parágrafos de texto denso em estilo editorial/brutalista (2xa.studio)
       this.rawText = `DRIVEN DESIGN STUDIO BETWEEN BRAND STRATEGY VISUAL IDENTITY DIGITIZATION PROCESSES SHAPED BY INPUT NO SINGLE OUTCOME IS TREATED AS FINAL SYSTEMATICS UNFOLD THROUGH DEPENDENCY AND ITERATION EACH STATE EMERGES FROM PREVIOUS CONDITIONS AND INFLUENCES WHAT FOLLOWS CHANGE IS NOT AN EFFECT APPLIED AFTERWARD BUT AN INHERENT PROPERTY OF THE SYSTEM COMPUTATIONAL DESIGN DRAWS INPUT FROM EXISTING CONDITIONS INCLUDING MACHINE PROCESSES HUMAN INTENTIONS AND BRAND STRATEGY `;
 
       this.particles = [];
@@ -28,17 +27,25 @@ document.addEventListener('DOMContentLoaded', () => {
       this.animationFrameId = null;
       this.rectCache = null;
 
-      // Ajuste adaptativo de densidade para dispositivos móveis
       const isMobile = window.innerWidth < 768;
       this.fontSize = isMobile ? 12 : 13;
       this.lineHeight = isMobile ? 26 : 21;
       this.letterSpacing = isMobile ? 16 : 11;
       this.lineSpeeds = [];
 
+      // Inicialização diferida para evitar tarefas longas (Long Tasks) no PageSpeed
+      const scheduleInit = () => {
+        if (window.requestIdleCallback) {
+          window.requestIdleCallback(() => this.init(), { timeout: 1000 });
+        } else {
+          setTimeout(() => this.init(), 100);
+        }
+      };
+
       if (document.fonts) {
-        document.fonts.ready.then(() => this.init());
+        document.fonts.ready.then(scheduleInit);
       } else {
-        setTimeout(() => this.init(), 200);
+        scheduleInit();
       }
     }
 
@@ -56,7 +63,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    // IntersectionObserver: pausa o canvas quando fora da visão (0% consumo de CPU no scroll)
     setupObserver() {
       if ('IntersectionObserver' in window) {
         const observer = new IntersectionObserver((entries) => {
@@ -136,7 +142,6 @@ document.addEventListener('DOMContentLoaded', () => {
       window.addEventListener('resize', () => this.resize(), { passive: true });
       window.addEventListener('scroll', () => this.updateRectCache(), { passive: true });
 
-      // Rastreamento de mouse com cache geométrico (0ms Reflow Forçado)
       window.addEventListener('mousemove', (e) => {
         if (!this.heroSection || this.isPaused || !this.rectCache) return;
         const rect = this.rectCache;
