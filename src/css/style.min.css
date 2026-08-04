@@ -1,0 +1,1024 @@
+/* ==========================================================================
+   RESET CSS & SMOOTH SCROLL (PERFORMANCE & OTIMIZAÇÃO CORE)
+   ========================================================================== */
+
+html {
+  box-sizing: border-box;
+  font-size: 16px;
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px; /* Offset para o Smart Header Fixo */
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+body, h1, h2, h3, h4, h5, h6, p, ol, ul, figure, blockquote, dl, dd {
+  margin: 0;
+  padding: 0;
+}
+
+ul, ol {
+  list-style: none;
+}
+
+img, video {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button, input, select, textarea {
+  font: inherit;
+  background: none;
+  border: none;
+  color: inherit;
+}
+
+/* Otimização de Foco Visual (Acessibilidade) */
+:focus-visible {
+  outline: 2px solid var(--color-lima);
+  outline-offset: 3px;
+}
+
+/* Suporte Naitvo & Inercial ao Lenis Smooth Scroll */
+html.lenis, html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+
+/* Variáveis Globais do Design System (Tokens) */
+:root {
+  /* Cores Extraídas da Referência */
+  --color-carbono: #2B2B2B;
+  --color-carbono-deep: #121413;
+  --color-off-white: #F2F2F2;
+  --color-lima: #C7F032;
+  --color-lavanda: #C8C5E2;
+  --color-menta: #DCE8D9;
+  --color-azul: #3B3386;
+
+  /* Semântica de Cores (Definições Iniciais) */
+  --bg-primary: var(--color-carbono-deep);
+  --text-primary: var(--color-off-white);
+  --accent-color: var(--color-lima);
+
+  /* Tipografia */
+  --font-headings: 'Antonio', 'Oswald', 'Impact', sans-serif-condensed; /* Antonio e Oswald serão importadas via Google Fonts como fallbacks premium */
+  --font-body: 'DM Sans', sans-serif;
+  --font-mono: 'Space Mono', 'JetBrains Mono', monospace;
+
+  /* Espaçamentos e Dimensões */
+  --grid-gap: 1.5rem;
+  --border-width: 1px;
+  --border-color: rgba(242, 242, 242, 0.15); /* off-white com opacidade */
+  --border-color-dark: rgba(43, 43, 43, 0.15); /* carbono com opacidade */
+
+  /* Transições padrão */
+  --transition-smooth: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+  --transition-fast: all 0.2s ease-in-out;
+}
+
+/* ==========================================================================
+   ESTILOS PRINCIPAIS — DESIGN SYSTEM & LAYOUT (TÍTULOS ESCUROS EM VERDE + MOBILE RESPONSIVO)
+   ========================================================================== */
+
+/* Configurações Gerais */
+body {
+  background-color: var(--color-carbono-deep);
+  color: var(--color-off-white);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* 1. EFEITO DE SELEÇÃO DE TEXTO (REFERÊNCIA DA IMAGEM 1) */
+::selection {
+  background-color: var(--color-lima) !important;
+  color: var(--color-carbono-deep) !important;
+}
+
+::-moz-selection {
+  background-color: var(--color-lima) !important;
+  color: var(--color-carbono-deep) !important;
+}
+
+/* Tipografia Base */
+h1, h2, h3, h4 {
+  font-family: var(--font-headings);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: -0.03em;
+  line-height: 0.9;
+  color: var(--color-off-white);
+}
+
+/* Elementos Mono / Estilo Código */
+.mono-badge {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  color: var(--color-lima);
+  text-transform: uppercase;
+  display: inline-block;
+  margin-bottom: 1rem;
+  border: 1px solid rgba(199, 240, 50, 0.4);
+  padding: 0.35rem 0.75rem;
+  border-radius: 2px;
+}
+
+.mono-text {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-off-white);
+}
+
+.text-large {
+  font-size: 1.25rem;
+  font-weight: 400;
+  line-height: 1.5;
+  max-width: 800px;
+  color: var(--color-off-white);
+}
+
+/* Layouts & Containers */
+.section-container {
+  padding: 5.5rem 5%;
+  border-bottom: var(--border-width) solid var(--border-color);
+  background-color: var(--color-carbono-deep);
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Seção Clara (Projetos) com Alto Contraste */
+.bg-claro {
+  background-color: var(--color-off-white) !important;
+  color: var(--color-carbono) !important;
+}
+
+.bg-claro h2, 
+.bg-claro h3, 
+.bg-claro p, 
+.bg-claro span {
+  color: var(--color-carbono) !important;
+}
+
+.text-dark {
+  color: var(--color-carbono) !important;
+}
+
+.text-dark-badge {
+  color: var(--color-azul) !important;
+  border: 1px solid rgba(59, 51, 134, 0.4) !important;
+}
+
+/* Linha Divisória de Seção */
+.section-header {
+  display: flex;
+  align-items: baseline;
+  gap: 1.5rem;
+  margin-bottom: 3.5rem;
+  border-bottom: var(--border-width) solid var(--border-color);
+  padding-bottom: 1.25rem;
+}
+
+.border-dark {
+  border-bottom: var(--border-width) solid var(--border-color-dark) !important;
+}
+
+.section-number {
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  color: var(--color-lima);
+}
+
+.section-header.border-dark .section-number {
+  color: var(--color-azul) !important;
+}
+
+/* TÍTULOS DE SEÇÃO EM FUNDO ESCURO: COR VERDE DE DESTAQUE (#C7F032) */
+.section-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--color-lima) !important; /* Cor verde de destaque em fundo escuro */
+}
+
+/* Na Seção Clara (Projetos), mantemos o título escuro de alto contraste */
+.bg-claro .section-title {
+  color: var(--color-carbono) !important;
+}
+
+/* Botões */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 0.875rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 1rem 2rem;
+  border-radius: 2px;
+  border: 1px solid var(--color-off-white);
+  transition: var(--transition-smooth);
+  cursor: pointer;
+}
+
+.btn-primary {
+  background-color: var(--color-lima);
+  color: var(--color-carbono) !important;
+  border-color: var(--color-lima);
+  font-weight: 700;
+}
+
+.btn-primary:hover {
+  background-color: transparent;
+  color: var(--color-lima) !important;
+  border-color: var(--color-lima);
+  transform: translateY(-2px);
+}
+
+.btn-header {
+  padding: 0.5rem 1.25rem;
+  font-size: 0.75rem;
+  border-color: rgba(242, 242, 242, 0.4);
+  color: var(--color-off-white);
+}
+
+.btn-header:hover {
+  border-color: var(--color-lima);
+  color: var(--color-lima);
+}
+
+.btn-cta {
+  background-color: var(--color-lima);
+  color: var(--color-carbono) !important;
+  border-color: var(--color-lima);
+  font-size: 1.125rem;
+  padding: 1.25rem 3rem;
+  font-weight: 700;
+}
+
+.btn-cta:hover {
+  background-color: transparent;
+  color: var(--color-lima) !important;
+  border-color: var(--color-lima);
+  transform: scale(1.03);
+}
+
+.btn-project-behance {
+  margin-top: 1rem;
+  padding: 0.6rem 1.25rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background-color: var(--color-carbono);
+  color: var(--color-off-white) !important;
+  border-color: var(--color-carbono);
+  transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+}
+
+.btn-project-behance:hover {
+  background-color: var(--color-azul);
+  color: var(--color-off-white) !important;
+  border-color: var(--color-azul);
+  transform: translateX(3px);
+}
+
+/* Smart Header (Oculta ao rolar para baixo, reaparece ao rolar para cima) */
+.site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  background-color: rgba(18, 20, 19, 0.95);
+  backdrop-filter: blur(8px);
+  border-bottom: var(--border-width) solid var(--border-color);
+  transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+  will-change: transform;
+}
+
+.site-header.header-hidden {
+  transform: translateY(-100%);
+}
+
+.header-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 5%;
+}
+
+.site-logo {
+  font-family: var(--font-headings);
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--color-off-white);
+  transition: color 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.site-logo:hover {
+  color: var(--color-lima) !important; /* Efeito hover verde de destaque no nome do menu */
+}
+
+.nav-links {
+  display: flex;
+  gap: 2.5rem;
+}
+
+.nav-link {
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  letter-spacing: 0.1em;
+  color: var(--color-off-white);
+  opacity: 0.7;
+  transition: var(--transition-fast);
+}
+
+.nav-link:hover {
+  opacity: 1;
+  color: var(--color-lima);
+}
+
+/* Hero Section */
+.hero-section {
+  min-height: calc(100vh - 80px);
+  display: flex;
+  align-items: center;
+  position: relative;
+  padding: 8rem 5% 4rem 5%;
+  border-bottom: var(--border-width) solid var(--border-color);
+  background-color: var(--color-carbono-deep);
+  overflow: hidden;
+}
+
+/* Background de Texto Interativo tipo 2xa.studio (Onda + Deriva Flutuante) */
+.hero-text-bg-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.35; /* Opacidade bem presente e nítida */
+}
+
+#hero-text-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.hero-container {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.hero-title {
+  font-size: 5.5rem;
+  margin-bottom: 2rem;
+  letter-spacing: -0.04em;
+  line-height: 0.85;
+  color: var(--color-off-white);
+}
+
+.text-accent {
+  color: var(--color-lima) !important;
+}
+
+.hero-description {
+  font-size: 1.25rem;
+  max-width: 650px;
+  margin-bottom: 3.5rem;
+  color: var(--color-off-white);
+  opacity: 0.85;
+}
+
+.hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 3rem;
+  flex-wrap: wrap;
+}
+
+.scroll-indicator-link {
+  opacity: 0.6;
+  transition: var(--transition-fast);
+  color: var(--color-off-white);
+}
+
+.scroll-indicator-link:hover {
+  opacity: 1;
+  color: var(--color-lima);
+}
+
+/* ==========================================================================
+   01. SEÇÃO PRAZER ME CHAMO... (40% TEXTO / 60% IMAGEM CENTRALIZADA)
+   ========================================================================== */
+
+.about-grid {
+  display: grid;
+  grid-template-columns: 38% 59%;
+  gap: 3%;
+  align-items: center;
+}
+
+.about-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* Título em Fundo Escuro: Verde de Destaque */
+.about-heading {
+  font-size: 2.35rem;
+  line-height: 0.95;
+  color: var(--color-lima) !important; /* Cor verde de destaque */
+  margin-bottom: 0.25rem;
+}
+
+.about-paragraph {
+  font-size: 0.975rem;
+  line-height: 1.6;
+  color: var(--color-off-white);
+  opacity: 0.88;
+}
+
+.about-actions {
+  margin-top: 0.75rem;
+}
+
+.about-image-container {
+  width: 100%;
+  height: 390px;
+  max-height: 390px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 4px;
+}
+
+.about-image-container picture {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.about-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 75%;
+  display: block;
+  transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.about-image-container:hover .about-photo {
+  transform: scale(1.03);
+}
+
+/* ==========================================================================
+   02. CARDS DE ETAPAS (SINTETIZADOS E HOMOGÊNEOS)
+   ========================================================================== */
+
+.metodo-intro {
+  margin-bottom: 3.5rem;
+}
+
+.metodo-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1.5rem;
+}
+
+.metodo-card {
+  border: 1px solid rgba(242, 242, 242, 0.15);
+  border-top: 4px solid var(--color-lima);
+  padding: 2rem 1.5rem;
+  background-color: rgba(255, 255, 255, 0.03);
+  min-height: 280px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  border-radius: 4px;
+  transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), 
+              background-color 0.3s ease, 
+              border-color 0.3s ease;
+}
+
+.metodo-card:hover {
+  background-color: rgba(199, 240, 50, 0.08);
+  border-top-color: var(--color-lima);
+}
+
+.card-num {
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  color: var(--color-lima);
+  display: block;
+  margin-bottom: 1rem;
+  font-weight: 700;
+}
+
+.card-title {
+  font-size: 1.35rem;
+  margin-bottom: 1rem;
+  color: var(--color-off-white);
+  letter-spacing: -0.02em;
+}
+
+.card-desc {
+  font-size: 0.875rem;
+  color: var(--color-off-white);
+  opacity: 0.85;
+  line-height: 1.6;
+}
+
+/* ==========================================================================
+   03. CARDS DE PROJETOS SELECIONADOS
+   ========================================================================== */
+
+.projetos-intro {
+  margin-bottom: 3.5rem;
+}
+
+.projetos-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+.project-card {
+  display: grid;
+  grid-template-columns: 55% 45%;
+  border: 1px solid var(--border-color-dark);
+  background-color: #FFFFFF;
+  border-radius: 4px;
+  overflow: hidden;
+  min-height: 290px;
+  max-height: 310px;
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), 
+              box-shadow 0.4s ease, 
+              border-color 0.4s ease;
+  will-change: transform;
+}
+
+.project-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--color-azul);
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.09);
+}
+
+.project-info {
+  padding: 2.25rem 2.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-right: 1px solid var(--border-color-dark);
+  background-color: #FFFFFF;
+}
+
+.project-title {
+  font-size: 1.85rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.35rem;
+  color: var(--color-carbono) !important;
+  line-height: 0.95;
+}
+
+.project-category-text {
+  font-family: var(--font-mono);
+  font-size: 0.725rem;
+  letter-spacing: 0.08em;
+  color: var(--color-azul) !important;
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+}
+
+.project-desc {
+  font-size: 0.9rem;
+  color: var(--color-carbono) !important;
+  opacity: 0.85;
+  max-width: 460px;
+  line-height: 1.5;
+}
+
+.project-image-container {
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 290px;
+  max-height: 310px;
+  background-color: #EAEAEA;
+}
+
+.project-behance-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  min-height: 290px;
+  max-height: 310px;
+  display: block;
+  transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+  will-change: transform;
+}
+
+.project-card:hover .project-behance-img {
+  transform: scale(1.035);
+}
+
+/* ==========================================================================
+   04. BENTO GRID DE SERVIÇOS
+   ========================================================================== */
+
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 1.5rem;
+}
+
+.bento-card {
+  padding: 2.25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-radius: 4px;
+  transition: background-color 0.35s ease, 
+              color 0.35s ease, 
+              border-color 0.35s ease, 
+              transform 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+  will-change: transform, background-color;
+}
+
+.bento-half {
+  grid-column: span 6;
+  min-height: 240px;
+}
+
+.bento-third {
+  grid-column: span 4;
+  min-height: 260px;
+}
+
+.bento-full {
+  grid-column: span 12;
+  min-height: 180px;
+}
+
+.bento-title {
+  font-size: 1.65rem;
+  margin-top: 1rem;
+  margin-bottom: 0.75rem;
+  transition: color 0.35s ease;
+}
+
+.bento-desc {
+  font-size: 0.9rem;
+  line-height: 1.55;
+  opacity: 0.95;
+  transition: color 0.35s ease;
+}
+
+/* Efeito de Seleção de Texto Global & Contrastes */
+::selection {
+  background-color: var(--color-lima) !important;
+  color: var(--color-carbono-deep) !important;
+}
+
+/* Boas Práticas de Quebra de Linha Tipográfica (Sem Palavras Órfãs) */
+h1, h2, h3, h4, 
+.hero-title, 
+.section-title, 
+.about-heading, 
+.cta-title, 
+.bento-title, 
+.card-title {
+  text-wrap: balance;
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+p, 
+.hero-description, 
+.about-paragraph, 
+.card-desc, 
+.bento-desc, 
+.cta-desc, 
+.text-large {
+  text-wrap: pretty;
+}
+
+/* Seleção de Texto dentro dos Cards de Serviços em Hover */
+.card-inverted-default ::selection {
+  background-color: var(--color-carbono-deep) !important;
+  color: var(--color-lima) !important;
+}
+
+.card-inverted-default:hover ::selection {
+  background-color: var(--color-lima) !important;
+  color: var(--color-carbono-deep) !important;
+}
+
+.card-standard ::selection {
+  background-color: var(--color-lima) !important;
+  color: var(--color-carbono-deep) !important;
+}
+
+.card-standard:hover ::selection {
+  background-color: var(--color-carbono-deep) !important;
+  color: var(--color-lima) !important;
+}
+
+/* Prevenção de Emojis em Setas no Mobile (iOS / Android) */
+.arrow-text {
+  font-family: var(--font-body), sans-serif;
+  font-style: normal;
+  font-variant-emoji: text;
+  display: inline-block;
+  margin-left: 0.15em;
+  color: inherit;
+}
+
+/* --- CARD 1 (Identidade Visual): INVERTIDO POR PADRÃO --- */
+.card-inverted-default {
+  background-color: var(--color-lima);
+  color: var(--color-carbono-deep);
+  border: 1px solid var(--color-lima);
+}
+
+.card-inverted-default h3, 
+.card-inverted-default p, 
+.card-inverted-default .card-num {
+  color: var(--color-carbono-deep);
+}
+
+/* HOVER NO CARD 1: INVERTE PARA ESCURO */
+.card-inverted-default:hover {
+  background-color: var(--color-carbono-deep);
+  border-color: var(--color-off-white);
+  transform: translateY(-6px);
+}
+
+.card-inverted-default:hover h3, 
+.card-inverted-default:hover p {
+  color: var(--color-off-white);
+}
+
+.card-inverted-default:hover .card-num {
+  color: var(--color-lima);
+}
+
+/* --- CARDS 2 A 6: PADRONIZADOS POR PADRÃO --- */
+.card-standard {
+  background-color: rgba(255, 255, 255, 0.03);
+  color: var(--color-off-white);
+  border: 1px solid rgba(242, 242, 242, 0.25);
+}
+
+.card-standard h3, 
+.card-standard p {
+  color: var(--color-off-white);
+}
+
+.card-standard .card-num {
+  color: var(--color-lima);
+}
+
+.card-borda-lima {
+  border: 1px solid var(--color-lima);
+}
+
+/* HOVER NOS CARDS 2 A 6: INVERTE PARA VERDE-LIMA */
+.card-standard:hover {
+  background-color: var(--color-lima);
+  border-color: var(--color-lima);
+  transform: translateY(-6px);
+}
+
+.card-standard:hover h3, 
+.card-standard:hover p, 
+.card-standard:hover .card-num {
+  color: var(--color-carbono-deep);
+}
+
+/* Seção CTA Section */
+.cta-section {
+  padding: 8rem 5%;
+  text-align: center;
+  background-color: var(--color-carbono-deep);
+  border-top: var(--border-width) solid var(--border-color);
+  border-bottom: var(--border-width) solid var(--border-color);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Background de Texto Interativo na Seção CTA (Identico ao Hero) */
+.cta-text-bg-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.35;
+}
+
+#cta-text-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.cta-container {
+  position: relative;
+  z-index: 2;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.cta-title {
+  font-size: 3.5rem;
+  margin-top: 1.5rem;
+  margin-bottom: 2rem;
+  letter-spacing: -0.03em;
+  color: var(--color-lima) !important; /* Cor verde de destaque */
+}
+
+.cta-desc {
+  font-size: 1.125rem;
+  opacity: 0.85;
+  margin-bottom: 3.5rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  color: var(--color-off-white);
+}
+
+/* Footer */
+.site-footer {
+  padding: 3rem 5%;
+  background-color: var(--color-carbono-deep);
+}
+
+.footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.footer-copyright {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-off-white);
+}
+
+.social-links {
+  display: flex;
+  gap: 2rem;
+}
+
+.social-link {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  opacity: 0.7;
+  color: var(--color-off-white);
+  transition: var(--transition-fast);
+}
+
+.social-link:hover {
+  opacity: 1;
+  color: var(--color-lima);
+}
+
+/* ==========================================================================
+   RESPONSIVIDADE (MEDIA QUERIES) - MOBILE FIRST & REORDENAÇÃO DO BOTÃO
+   ========================================================================== */
+
+@media (max-width: 1200px) {
+  .metodo-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  /* SEÇÃO PRAZER ME CHAMO... (MOBILE: BOTÃO APÓS A IMAGEM E CENTRALIZADO) */
+  .about-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .about-heading {
+    font-size: 2rem;
+  }
+
+  .about-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .about-image-container {
+    width: 100%;
+    max-height: 380px;
+  }
+
+  .about-actions {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+
+  .btn-about-cta {
+    width: 100%;
+    max-width: 340px;
+    text-align: center;
+  }
+
+  .metodo-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .metodo-card {
+    min-height: auto;
+  }
+
+  .project-card {
+    grid-template-columns: 1fr;
+    max-height: none;
+    min-height: auto;
+  }
+
+  .project-info {
+    border-right: none;
+    border-bottom: 1px solid var(--border-color-dark);
+    padding: 2rem;
+  }
+
+  .project-image-container,
+  .project-behance-img {
+    min-height: 250px;
+    max-height: 300px;
+  }
+
+  .bento-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bento-half, 
+  .bento-third, 
+  .bento-full {
+    grid-column: span 1;
+    min-height: auto;
+    padding: 1.75rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 3.25rem;
+  }
+
+  .nav-links {
+    display: none;
+  }
+
+  .section-title {
+    font-size: 1.8rem;
+  }
+
+  .cta-title {
+    font-size: 2.25rem;
+  }
+}
