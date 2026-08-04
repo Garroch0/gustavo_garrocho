@@ -1,13 +1,13 @@
 /**
  * Gustavo Garrocho — Motor de Texto Interativo 2xa.studio
- * Deslizamento Cinemático (10px/s) com Teleporte Instantâneo de Borda (Zero Voo de Caracteres)
+ * Deslizamento Cinemático (10px/s) com Teleporte de Borda e Repulsão Vetorial Suave
  * DPOS 2026
  */
 
 document.addEventListener('DOMContentLoaded', () => {
 
   // --------------------------------------------------------------------------
-  // 1. MOTOR CANVAS 2D DE TEXTO INTERATIVO (TELEPORTE EM WRAP DE BORDA)
+  // 1. MOTOR CANVAS 2D DE TEXTO INTERATIVO (REDUÇÃO DE WRAP + HOVER ESTÁVEL)
   // --------------------------------------------------------------------------
   class InteractiveTextBackground {
     constructor(canvasId = 'hero-text-canvas', sectionId = 'hero') {
@@ -230,10 +230,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
           const angle = Math.atan2(dy, dx);
           targetX = currentOriginX - Math.cos(angle) * force;
-          targetY = currentOriginY - Sin(angle) ? currentOriginY - Math.sin(angle) * force : currentOriginY;
+          targetY = currentOriginY - Math.sin(angle) * force;
         }
 
-        // ELIMINAÇÃO DO VOO DE CARACTERES: Quando o caractere reinicia a volta na borda, realiza o teleporte imediato!
+        // Teleporte imediato de borda no wrap para evitar caracteres flutuando pela tela
         if (Math.abs(targetX - p.x) > this.letterSpacing * 6) {
           p.x = targetX;
           p.y = targetY;
