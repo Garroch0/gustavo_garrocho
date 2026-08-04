@@ -1,13 +1,13 @@
 /**
  * Gustavo Garrocho — Motor de Texto Interativo 2xa.studio
- * Espalhamento Central Intensificado (65px) + Opacidade Verde-Lima 100% Sólida no Centro do Cursor
+ * Deslizamento Cinemático (10px/s) + Desativação de Hover sob o Header Fixo
  * DPOS 2026
  */
 
 document.addEventListener('DOMContentLoaded', () => {
 
   // --------------------------------------------------------------------------
-  // 1. MOTOR CANVAS 2D DE TEXTO INTERATIVO (HOVER AMBIENTE 100% OPACIDADE VERDE)
+  // 1. MOTOR CANVAS 2D DE TEXTO INTERATIVO (DESATIVA HOVER SOB O MENU HEADER)
   // --------------------------------------------------------------------------
   class InteractiveTextBackground {
     constructor(canvasId = 'hero-text-canvas', sectionId = 'hero') {
@@ -21,12 +21,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
       this.ctx = this.canvas.getContext('2d');
       this.heroSection = document.getElementById(sectionId);
+      this.header = document.getElementById('main-header');
       if (!this.heroSection) return;
 
       this.rawText = `DRIVEN DESIGN STUDIO BETWEEN BRAND STRATEGY VISUAL IDENTITY DIGITIZATION PROCESSES SHAPED BY INPUT NO SINGLE OUTCOME IS TREATED AS FINAL SYSTEMATICS UNFOLD THROUGH DEPENDENCY AND ITERATION EACH STATE EMERGES FROM PREVIOUS CONDITIONS AND INFLUENCES WHAT FOLLOWS CHANGE IS NOT AN EFFECT APPLIED AFTERWARD BUT AN INHERENT PROPERTY OF THE SYSTEM COMPUTATIONAL DESIGN DRAWS INPUT FROM EXISTING CONDITIONS INCLUDING MACHINE PROCESSES HUMAN INTENTIONS AND BRAND STRATEGY `;
 
       this.particles = [];
-      this.mouse = { x: -9999, y: -9999, radius: 250, active: false }; // Raio amplo de 250px
+      this.mouse = { x: -9999, y: -9999, radius: 240, active: false };
       this.time = 0;
       this.isPaused = false;
       this.animationFrameId = null;
@@ -161,7 +162,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!this.heroSection || this.isPaused || !this.rectCache) return;
         const rect = this.rectCache;
         
+        // Bloqueia a colisão do mouse se o cursor estiver em cima do Menu Header
+        const isOverHeader = this.header && (
+          e.clientY <= (this.header.offsetHeight || 80) || 
+          (e.target && e.target.closest && e.target.closest('#main-header'))
+        );
+
         if (
+          !isOverHeader &&
           e.clientX >= rect.left &&
           e.clientX <= rect.right &&
           e.clientY >= rect.top &&
@@ -180,7 +188,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const rect = this.rectCache;
         const touch = e.touches[0];
 
+        const isOverHeader = this.header && (
+          touch.clientY <= (this.header.offsetHeight || 80)
+        );
+
         if (
+          !isOverHeader &&
           touch.clientX >= rect.left &&
           touch.clientX <= rect.right &&
           touch.clientY >= rect.top &&
@@ -189,6 +202,8 @@ document.addEventListener('DOMContentLoaded', () => {
           this.mouse.x = touch.clientX - rect.left;
           this.mouse.y = touch.clientY - rect.top;
           this.mouse.active = true;
+        } else {
+          this.mouse.active = false;
         }
       }, { passive: true });
     }
@@ -224,7 +239,6 @@ document.addEventListener('DOMContentLoaded', () => {
           isHovered = true;
           const proximity = (this.mouse.radius - distance) / this.mouse.radius;
           
-          // Espalhamento central intensificado (65px)
           const smoothFactor = Math.sin(proximity * Math.PI * 0.5);
           const maxForce = 65 * p.forceFactor;
           const force = smoothFactor * maxForce;
@@ -246,13 +260,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // Renderização com Verde-Lima 100% Opaco Sólido no centro do cursor
         if (isHovered) {
           const proximity = (this.mouse.radius - distance) / this.mouse.radius;
-          // Opacidade verde iniciando em 100% (1.0) no centro do mouse
-          const alpha = 0.35 + (proximity * 0.65); // Centro = 1.0 (100% opaco)
+          const alpha = 0.35 + (proximity * 0.65);
 
           if (proximity > 0.22) {
-            this.ctx.fillStyle = `rgba(199, 240, 50, ${alpha.toFixed(2)})`; // Verde-Lima radiante sólido 100%
+            this.ctx.fillStyle = `rgba(199, 240, 50, ${alpha.toFixed(2)})`;
           } else {
-            this.ctx.fillStyle = `rgba(242, 242, 242, ${alpha.toFixed(2)})`; // Off-white suave na borda
+            this.ctx.fillStyle = `rgba(242, 242, 242, ${alpha.toFixed(2)})`;
           }
         } else {
           this.ctx.fillStyle = 'rgba(242, 242, 242, 0.35)';
