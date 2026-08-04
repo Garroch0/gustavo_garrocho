@@ -57,21 +57,10 @@
 
   <!-- Google Fonts: Antonio, DM Sans, Space Mono com font-display=swap -->
   <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@700&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
-  
-  <!-- Critical CSS Inline (Renderização Instantânea em 0.0s do Layout Base) -->
-  <style>
-    :root{--color-carbono-deep:#121413;--color-carbono:#1a1c1b;--color-offwhite:#f2f2f2;--color-lima:#c7f032;}
-    body{margin:0;padding:0;background-color:var(--color-carbono-deep);color:var(--color-offwhite);font-family:'DM Sans',sans-serif;-webkit-font-smoothing:antialiased;}
-    .hero-section{position:relative;min-height:90vh;display:flex;align-items:center;padding:6rem 5% 4rem;overflow:hidden;}
-    .hero-title{font-family:'Antonio',sans-serif;font-size:clamp(2.8rem,7vw,6.2rem);line-height:0.95;letter-spacing:-0.03em;text-transform:uppercase;margin-bottom:1.5rem;}
-    .text-accent{color:var(--color-lima);}
-  </style>
 
-  <!-- CSS Unificado Não-Bloqueantes -->
-  <link rel="preload" as="style" href="src/css/style.min.css?v=54">
-  <link rel="stylesheet" href="src/css/style.min.css?v=54" media="print" onload="this.media='all'">
-  <noscript><link rel="stylesheet" href="src/css/style.min.css?v=54"></noscript>
-  <link rel="stylesheet" href="src/css/vendor/lenis.css?v=54" media="print" onload="this.media='all'">
+  <!-- CSS Unificado Principal (Direto e Sem FOUC / Zero Piscada de Links Azuis) -->
+  <link rel="stylesheet" href="src/css/style.min.css?v=55">
+  <link rel="stylesheet" href="src/css/vendor/lenis.css?v=55" media="print" onload="this.media='all'">
 
   <!-- Dados Estruturados JSON-LD (Schema.org SEO Oficial para Google Search & Brave) -->
   <script type="application/ld+json">
@@ -227,7 +216,7 @@
         <div class="metodo-card interactive-card">
           <span class="card-num">03</span>
           <h3 class="card-title">CRIAÇÃO</h3>
-          <p class="card-desc">Construção visual da marca baseada em pesquisa, conceito central, prototipagem técnica e validação em contexts reais de uso.</p>
+          <p class="card-desc">Construção visual da marca baseada em pesquisa, conceito central, prototipagem técnica e validação em contextos reais de uso.</p>
         </div>
 
         <!-- Etapa 04 -->
@@ -384,10 +373,10 @@
   <script src="src/js/vendor/gsap.min.js" defer></script>
   <script src="src/js/vendor/ScrollTrigger.min.js" defer></script>
 
-  <!-- Scripts da Aplicação com Cache-Busting v=54 -->
-  <script src="src/js/analytics.js?v=54" defer></script>
-  <script src="src/js/app.js?v=54" defer></script>
-  <script src="src/js/behance-integration.js?v=54" defer></script>
-  <script src="src/js/animations.js?v=54" defer></script>
+  <!-- Scripts da Aplicação com Cache-Busting v=55 -->
+  <script src="src/js/analytics.js?v=55" defer></script>
+  <script src="src/js/app.js?v=55" defer></script>
+  <script src="src/js/behance-integration.js?v=55" defer></script>
+  <script src="src/js/animations.js?v=55" defer></script>
 </body>
 </html>
