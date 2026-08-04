@@ -1,10 +1,6 @@
 /**
  * Gustavo Garrocho — Sincronização Oficial dos 2 Projetos Selecionados do Behance
- * Perfil: https://www.behance.net/Garrocho
- * 
- * Case 1: Okay Company — Rebrand Identity (https://www.behance.net/gallery/246089501/Okay-Company-Rebrand-Identity)
- * Case 2: Arquitetura Invicto — Site profissional (https://www.behance.net/gallery/251530349/Arquitetura-Invicto-Site-profissional)
- * 
+ * Otimizado com DocumentFragment para 0 Reflows de DOM no PageSpeed
  * DPOS 2026
  */
 
@@ -12,7 +8,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const container = document.getElementById('projetos-container');
   if (!container) return;
 
-  // Lista dos 2 Projetos Oficiais Solicitados
   const behanceProjects = [
     {
       num: '01',
@@ -36,6 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function renderProjects(list) {
     container.innerHTML = '';
+    const fragment = document.createDocumentFragment();
     
     list.forEach((proj) => {
       const card = document.createElement('article');
@@ -56,7 +52,9 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
       `;
       
-      container.appendChild(card);
+      fragment.appendChild(card);
     });
+
+    container.appendChild(fragment);
   }
 });

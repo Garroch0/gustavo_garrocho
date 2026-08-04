@@ -1,33 +1,34 @@
 /**
  * Gustavo Garrocho — Lenis Smooth Scroll Global & Smart Header (60fps)
+ * Otimizado com Eventos Passivos e Damping Suave
  * DPOS 2026
  */
 
 document.addEventListener('DOMContentLoaded', () => {
 
-  // 1. INICIALIZAÇÃO DO LENIS SMOOTH SCROLL (STUDIO FREIGHT INERTIA ENGINE)
+  // 1. INICIALIZAÇÃO DO LENIS SMOOTH SCROLL (INERTIA ENGINE 60FPS)
   let lenis = null;
 
   if (typeof Lenis !== 'undefined') {
     lenis = new Lenis({
       duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // Easing inercial ultra suave
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       orientation: 'vertical',
       gestureOrientation: 'vertical',
       smoothWheel: true,
       wheelMultiplier: 1,
-      touchMultiplier: 1.5,
+      touchMultiplier: 1,
       infinite: false
     });
 
-    // Loop de renderização acelerado por GPU via requestAnimationFrame
     function raf(time) {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
+      if (lenis) {
+        lenis.raf(time);
+        requestAnimationFrame(raf);
+      }
     }
     requestAnimationFrame(raf);
 
-    // Sincronização com GSAP ScrollTrigger
     if (typeof ScrollTrigger !== 'undefined') {
       lenis.on('scroll', ScrollTrigger.update);
       gsap.ticker.add((time) => {
@@ -37,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // 2. SMART HEADER AUTO-HIDE (DESEMPENHO OTIMIZADO)
+  // 2. SMART HEADER AUTO-HIDE (PASSIVE EVENT LOOP)
   const header = document.getElementById('main-header');
   let lastScrollY = window.scrollY;
   let ticking = false;
@@ -82,14 +83,12 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
 
         if (lenis) {
-          // Rolagem inercial cinemática do Lenis com offset do header
           lenis.scrollTo(targetElement, {
             offset: -80,
-            duration: 1.3,
+            duration: 1.2,
             easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t))
           });
         } else {
-          // Fallback nativo
           const headerOffset = 80;
           const elementPosition = targetElement.getBoundingClientRect().top;
           const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
