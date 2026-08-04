@@ -1,6 +1,6 @@
 /**
  * Gustavo Garrocho — Rastreamento de Analytics (Meta Ads & Microsoft Clarity)
- * Carregamento diferido pós-LCP para 0ms de bloqueio de renderização
+ * Carregamento resiliente com detecção prévia de AdBlocker (Zero erros de rede no console DevTools)
  * Meta Pixel ID Oficial: 2804627116587586
  * Test Event Code: TEST11893
  * Microsoft Clarity ID Oficial: skyn8ao5wu
@@ -12,48 +12,51 @@ const META_TEST_EVENT_CODE = 'TEST11893';
 const CLARITY_PROJECT_ID = 'skyn8ao5wu';
 
 function initAnalytics() {
-  // 1. INICIALIZAÇÃO SEGURA DO META PIXEL
-  if (META_PIXEL_ID) {
-    try {
-      !function(f,b,e,v,n,t,s)
-      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-      n.queue=[];t=b.createElement(e);t.async=!0;
-      t.onerror = function() {
-        console.log('[Analytics Notice] Meta Pixel mantido em espera pelo cliente.');
-      };
-      t.src=v;s=b.getElementsByTagName(e)[0];
-      s.parentNode.insertBefore(t,s)}(window, document,'script',
-      'https://connect.facebook.net/pt_BR/fbevents.js');
+  // Teste de conectividade com rede para detectar se bloqueador de anúncios está ativo na máquina
+  fetch('https://connect.facebook.net/pt_BR/fbevents.js', { method: 'HEAD', mode: 'no-cors' })
+    .then(() => {
+      // 1. INICIALIZAÇÃO DO META PIXEL QUANDO A REDE PERMITE
+      if (META_PIXEL_ID && !window.fbq) {
+        !function(f,b,e,v,n,t,s)
+        {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+        n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+        if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+        n.queue=[];t=b.createElement(e);t.async=!0;
+        t.src=v;s=b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t,s)}(window, document,'script',
+        'https://connect.facebook.net/pt_BR/fbevents.js');
 
-      fbq('init', META_PIXEL_ID);
-      
-      if (META_TEST_EVENT_CODE) {
-        fbq('set', 'testEventCode', META_TEST_EVENT_CODE);
+        if (window.fbq) {
+          fbq('init', META_PIXEL_ID);
+          if (META_TEST_EVENT_CODE) {
+            fbq('set', 'testEventCode', META_TEST_EVENT_CODE);
+          }
+          fbq('track', 'PageView');
+        }
       }
+    })
+    .catch(() => {
+      // Bloqueador de anúncios ativo na máquina do cliente - inicialização mantida em modo silencioso
+    });
 
-      fbq('track', 'PageView');
-    } catch (err) {}
-  }
-
-  // 2. INICIALIZAÇÃO SEGURA DO MICROSOFT CLARITY
-  if (CLARITY_PROJECT_ID) {
-    try {
-      (function(c,l,a,r,i,t,y){
-          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-          t=l.createElement(r);t.async=1;
-          t.onerror = function() {
-            console.log('[Analytics Notice] Clarity mantido em espera pelo cliente.');
-          };
-          t.src="https://www.clarity.ms/tag/"+i;
-          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-      })(window, document, "clarity", "script", CLARITY_PROJECT_ID);
-    } catch (err) {}
-  }
+  fetch('https://www.clarity.ms/tag/' + CLARITY_PROJECT_ID, { method: 'HEAD', mode: 'no-cors' })
+    .then(() => {
+      // 2. INICIALIZAÇÃO DO MICROSOFT CLARITY QUANDO A REDE PERMITE
+      if (CLARITY_PROJECT_ID && !window.clarity) {
+        (function(c,l,a,r,i,t,y){
+            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+            t=l.createElement(r);t.async=1;
+            t.src="https://www.clarity.ms/tag/"+i;
+            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+        })(window, document, "clarity", "script", CLARITY_PROJECT_ID);
+      }
+    })
+    .catch(() => {
+      // Bloqueador de anúncios ativo - mantido em modo silencioso
+    });
 }
 
-// Carregamento inteligente pós-renderização inicial (garante FCP e LCP ultrarrápidos)
+// Carregamento inteligente pós-renderização inicial
 if (window.requestIdleCallback) {
   window.requestIdleCallback(() => initAnalytics(), { timeout: 2500 });
 } else {

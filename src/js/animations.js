@@ -1,19 +1,24 @@
 /**
  * Gustavo Garrocho — Motor de Texto Interativo 2xa.studio
- * Correção de Sobreposição por Grade Matemática Perfeita (Strict Grid Index)
- * Repulsão Vetorial Suave com Clamping (Zero aceleração descontrolada)
+ * Deslizamento Cinemático de Baixa Velocidade (10px/s) com Controle Único de Loop
  * DPOS 2026
  */
 
 document.addEventListener('DOMContentLoaded', () => {
 
   // --------------------------------------------------------------------------
-  // 1. MOTOR CANVAS 2D DE TEXTO INTERATIVO (SEM SOBREPOSIÇÃO / SEM EXPLOSÃO)
+  // 1. MOTOR CANVAS 2D DE TEXTO INTERATIVO (SINGLETON CONTROL - ZERO DOUBLE LOOP)
   // --------------------------------------------------------------------------
   class InteractiveTextBackground {
     constructor(canvasId = 'hero-text-canvas', sectionId = 'hero') {
       this.canvas = document.getElementById(canvasId);
       if (!this.canvas) return;
+
+      // Evita reinicialização duplicada no mesmo canvas
+      if (this.canvas._instance) {
+        this.canvas._instance.destroy();
+      }
+      this.canvas._instance = this;
 
       this.ctx = this.canvas.getContext('2d');
       this.heroSection = document.getElementById(sectionId);
@@ -48,11 +53,23 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
+    destroy() {
+      this.isPaused = true;
+      if (this.animationFrameId) {
+        cancelAnimationFrame(this.animationFrameId);
+        this.animationFrameId = null;
+      }
+    }
+
     init() {
       this.updateRectCache();
       this.resize();
       this.bindEvents();
       this.setupObserver();
+      
+      if (this.animationFrameId) {
+        cancelAnimationFrame(this.animationFrameId);
+      }
       this.animate();
     }
 
@@ -69,7 +86,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (entry.isIntersecting) {
               if (this.isPaused) {
                 this.isPaused = false;
-                this.animate();
+                if (!this.animationFrameId) {
+                  this.animate();
+                }
               }
             } else {
               this.isPaused = true;
@@ -119,7 +138,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
           if (char === ' ') continue;
 
-          // Posições base originais da grade
           const baseColX = c * this.letterSpacing - this.letterSpacing * 2;
           const originY = r * this.lineHeight + this.fontSize;
 
@@ -131,7 +149,6 @@ document.addEventListener('DOMContentLoaded', () => {
             rowIndex: r,
             originY: originY,
             direction: direction,
-            // Sensibilidade vetorial controlada e suave
             forceFactor: 1.0 + (Math.sin(c * 0.5 + r) * 0.2)
           });
         }
@@ -179,24 +196,25 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     animate() {
-      if (this.isPaused) return;
+      if (this.isPaused) {
+        this.animationFrameId = null;
+        return;
+      }
 
-      this.time += 0.016; // Incremento suave de tempo 60fps
+      this.time += 0.016;
       this.ctx.clearRect(0, 0, this.width, this.height);
       this.ctx.font = `${this.fontSize}px "Space Mono", monospace`;
 
       for (let i = 0; i < this.particles.length; i++) {
         const p = this.particles[i];
 
-        // 1. CÁLCULO DE GRADE RIGOROSA CONTINUA (Impossibilita sobreposição vertical de colunas)
-        const rowShift = this.time * 28 * p.direction;
+        // Deslizamento sutil e pausado de 10px por segundo (sem velocidade acelerada)
+        const rowShift = this.time * 10 * p.direction;
         const rawX = (p.colIndex * this.letterSpacing) + rowShift;
         
-        // Modulo limpo que alinha cada caractere à distância exata de letterSpacing
         let currentOriginX = ((rawX % this.totalRowWidth) + this.totalRowWidth) % this.totalRowWidth - this.letterSpacing * 2;
         const currentOriginY = p.originY;
 
-        // 2. INTERAÇÃO VETORIAL SUAVE E CONTROLADA DO MOUSE (SEM ACELERAÇÃO DISPARADA)
         const dx = this.mouse.x - p.x;
         const dy = this.mouse.y - p.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
@@ -207,12 +225,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (distance < this.mouse.radius && this.mouse.active) {
           isHovered = true;
-          // Proximidade normalizada (0 no limite do raio, 1 no centro exato)
           const proximity = (this.mouse.radius - distance) / this.mouse.radius;
           
-          // Curva de repulsão suave controlada com limite máximo (Max Force = 48px)
           const smoothFactor = Math.sin(proximity * Math.PI * 0.5);
-          const maxForce = 48 * p.forceFactor;
+          const maxForce = 44 * p.forceFactor;
           const force = smoothFactor * maxForce;
 
           const angle = Math.atan2(dy, dx);
@@ -220,11 +236,9 @@ document.addEventListener('DOMContentLoaded', () => {
           targetY = currentOriginY - Math.sin(angle) * force;
         }
 
-        // Interpolação elástica fluida e estável (0.12)
         p.x += (targetX - p.x) * 0.12;
         p.y += (targetY - p.y) * 0.12;
 
-        // Renderização com Verde-Lima e Opacidade Gradativa Radial
         if (isHovered) {
           const proximity = (this.mouse.radius - distance) / this.mouse.radius;
           const alpha = 0.35 + (proximity * 0.65);
