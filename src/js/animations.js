@@ -1,13 +1,14 @@
 /**
  * Gustavo Garrocho — Motor de Texto Interativo 2xa.studio
- * Otimizado contra Long Tasks e Reflow Forçado (0ms bloqueio na thread principal)
+ * Correção de Sobreposição por Grade Matemática Perfeita (Strict Grid Index)
+ * Repulsão Vetorial Suave com Clamping (Zero aceleração descontrolada)
  * DPOS 2026
  */
 
 document.addEventListener('DOMContentLoaded', () => {
 
   // --------------------------------------------------------------------------
-  // 1. MOTOR CANVAS 2D DE TEXTO INTERATIVO (DIFERIDO CONTRA LONG TASKS)
+  // 1. MOTOR CANVAS 2D DE TEXTO INTERATIVO (SEM SOBREPOSIÇÃO / SEM EXPLOSÃO)
   // --------------------------------------------------------------------------
   class InteractiveTextBackground {
     constructor(canvasId = 'hero-text-canvas', sectionId = 'hero') {
@@ -21,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
       this.rawText = `DRIVEN DESIGN STUDIO BETWEEN BRAND STRATEGY VISUAL IDENTITY DIGITIZATION PROCESSES SHAPED BY INPUT NO SINGLE OUTCOME IS TREATED AS FINAL SYSTEMATICS UNFOLD THROUGH DEPENDENCY AND ITERATION EACH STATE EMERGES FROM PREVIOUS CONDITIONS AND INFLUENCES WHAT FOLLOWS CHANGE IS NOT AN EFFECT APPLIED AFTERWARD BUT AN INHERENT PROPERTY OF THE SYSTEM COMPUTATIONAL DESIGN DRAWS INPUT FROM EXISTING CONDITIONS INCLUDING MACHINE PROCESSES HUMAN INTENTIONS AND BRAND STRATEGY `;
 
       this.particles = [];
-      this.mouse = { x: -9999, y: -9999, radius: 240, active: false };
+      this.mouse = { x: -9999, y: -9999, radius: 210, active: false };
       this.time = 0;
       this.isPaused = false;
       this.animationFrameId = null;
@@ -30,15 +31,13 @@ document.addEventListener('DOMContentLoaded', () => {
       const isMobile = window.innerWidth < 768;
       this.fontSize = isMobile ? 12 : 13;
       this.lineHeight = isMobile ? 26 : 21;
-      this.letterSpacing = isMobile ? 16 : 11;
-      this.lineSpeeds = [];
+      this.letterSpacing = isMobile ? 16 : 12;
 
-      // Inicialização diferida para evitar tarefas longas (Long Tasks) no PageSpeed
       const scheduleInit = () => {
         if (window.requestIdleCallback) {
-          window.requestIdleCallback(() => this.init(), { timeout: 1000 });
+          window.requestIdleCallback(() => this.init(), { timeout: 800 });
         } else {
-          setTimeout(() => this.init(), 100);
+          setTimeout(() => this.init(), 80);
         }
       };
 
@@ -103,36 +102,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
     createParticles() {
       this.particles = [];
-      this.lineSpeeds = [];
 
-      const cols = Math.floor(this.width / this.letterSpacing) + 6;
-      const rows = Math.floor(this.height / this.lineHeight) + 2;
+      this.cols = Math.ceil(this.width / this.letterSpacing) + 8;
+      this.rows = Math.ceil(this.height / this.lineHeight) + 2;
 
+      this.totalRowWidth = this.cols * this.letterSpacing;
       const textLength = this.rawText.length;
 
-      for (let r = 0; r < rows; r++) {
-        const direction = r % 2 === 0 ? 0.45 : -0.45;
-        this.lineSpeeds.push(direction);
+      for (let r = 0; r < this.rows; r++) {
+        // Direção alternada da linha: pares para a direita (+1), ímpares para a esquerda (-1)
+        const direction = r % 2 === 0 ? 0.35 : -0.35;
+        let textOffset = (r * 17) % textLength;
 
-        let textOffset = (r * 15) % textLength;
-
-        for (let c = 0; c < cols; c++) {
+        for (let c = 0; c < this.cols; c++) {
           const char = this.rawText[(textOffset + c) % textLength];
 
           if (char === ' ') continue;
 
-          const originX = c * this.letterSpacing - this.letterSpacing * 2;
+          // Posições base originais da grade
+          const baseColX = c * this.letterSpacing - this.letterSpacing * 2;
           const originY = r * this.lineHeight + this.fontSize;
 
           this.particles.push({
             char: char,
-            x: originX,
+            x: baseColX,
             y: originY,
-            originX: originX,
+            colIndex: c,
+            rowIndex: r,
             originY: originY,
-            row: r,
             direction: direction,
-            density: (Math.random() * 25) + 15
+            // Sensibilidade vetorial controlada e suave
+            forceFactor: 1.0 + (Math.sin(c * 0.5 + r) * 0.2)
           });
         }
       }
@@ -181,52 +181,55 @@ document.addEventListener('DOMContentLoaded', () => {
     animate() {
       if (this.isPaused) return;
 
-      this.time += 0.025;
+      this.time += 0.016; // Incremento suave de tempo 60fps
       this.ctx.clearRect(0, 0, this.width, this.height);
       this.ctx.font = `${this.fontSize}px "Space Mono", monospace`;
 
       for (let i = 0; i < this.particles.length; i++) {
         const p = this.particles[i];
 
-        p.originX += p.direction;
+        // 1. CÁLCULO DE GRADE RIGOROSA CONTINUA (Impossibilita sobreposição vertical de colunas)
+        const rowShift = this.time * 28 * p.direction;
+        const rawX = (p.colIndex * this.letterSpacing) + rowShift;
+        
+        // Modulo limpo que alinha cada caractere à distância exata de letterSpacing
+        let currentOriginX = ((rawX % this.totalRowWidth) + this.totalRowWidth) % this.totalRowWidth - this.letterSpacing * 2;
+        const currentOriginY = p.originY;
 
-        if (p.originX > this.width + this.letterSpacing * 2) {
-          p.originX = -this.letterSpacing * 2;
-        } else if (p.originX < -this.letterSpacing * 2) {
-          p.originX = this.width + this.letterSpacing * 2;
-        }
-
-        const idleTargetX = p.originX;
-        const idleTargetY = p.originY;
-
+        // 2. INTERAÇÃO VETORIAL SUAVE E CONTROLADA DO MOUSE (SEM ACELERAÇÃO DISPARADA)
         const dx = this.mouse.x - p.x;
         const dy = this.mouse.y - p.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
 
-        let targetX = idleTargetX;
-        let targetY = idleTargetY;
+        let targetX = currentOriginX;
+        let targetY = currentOriginY;
         let isHovered = false;
 
         if (distance < this.mouse.radius && this.mouse.active) {
           isHovered = true;
+          // Proximidade normalizada (0 no limite do raio, 1 no centro exato)
           const proximity = (this.mouse.radius - distance) / this.mouse.radius;
+          
+          // Curva de repulsão suave controlada com limite máximo (Max Force = 48px)
+          const smoothFactor = Math.sin(proximity * Math.PI * 0.5);
+          const maxForce = 48 * p.forceFactor;
+          const force = smoothFactor * maxForce;
 
-          const forceDirectionX = dx / (distance || 1);
-          const forceDirectionY = dy / (distance || 1);
-          const force = proximity * p.density * 4.8;
-
-          targetX = idleTargetX - forceDirectionX * force;
-          targetY = idleTargetY - forceDirectionY * force;
+          const angle = Math.atan2(dy, dx);
+          targetX = currentOriginX - Math.cos(angle) * force;
+          targetY = currentOriginY - Math.sin(angle) * force;
         }
 
-        p.x += (targetX - p.x) * 0.14;
-        p.y += (targetY - p.y) * 0.14;
+        // Interpolação elástica fluida e estável (0.12)
+        p.x += (targetX - p.x) * 0.12;
+        p.y += (targetY - p.y) * 0.12;
 
+        // Renderização com Verde-Lima e Opacidade Gradativa Radial
         if (isHovered) {
           const proximity = (this.mouse.radius - distance) / this.mouse.radius;
           const alpha = 0.35 + (proximity * 0.65);
 
-          if (proximity > 0.30) {
+          if (proximity > 0.28) {
             this.ctx.fillStyle = `rgba(199, 240, 50, ${alpha.toFixed(2)})`;
           } else {
             this.ctx.fillStyle = `rgba(242, 242, 242, ${alpha.toFixed(2)})`;
