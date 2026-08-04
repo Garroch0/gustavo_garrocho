@@ -1,20 +1,19 @@
 /**
  * Gustavo Garrocho — Motor de Texto Interativo 2xa.studio
- * Deslizamento Cinemático de Baixa Velocidade (10px/s) com Controle Único de Loop
+ * Deslizamento Cinemático (10px/s) com Teleporte Instantâneo de Borda (Zero Voo de Caracteres)
  * DPOS 2026
  */
 
 document.addEventListener('DOMContentLoaded', () => {
 
   // --------------------------------------------------------------------------
-  // 1. MOTOR CANVAS 2D DE TEXTO INTERATIVO (SINGLETON CONTROL - ZERO DOUBLE LOOP)
+  // 1. MOTOR CANVAS 2D DE TEXTO INTERATIVO (TELEPORTE EM WRAP DE BORDA)
   // --------------------------------------------------------------------------
   class InteractiveTextBackground {
     constructor(canvasId = 'hero-text-canvas', sectionId = 'hero') {
       this.canvas = document.getElementById(canvasId);
       if (!this.canvas) return;
 
-      // Evita reinicialização duplicada no mesmo canvas
       if (this.canvas._instance) {
         this.canvas._instance.destroy();
       }
@@ -129,7 +128,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const textLength = this.rawText.length;
 
       for (let r = 0; r < this.rows; r++) {
-        // Direção alternada da linha: pares para a direita (+1), ímpares para a esquerda (-1)
         const direction = r % 2 === 0 ? 0.35 : -0.35;
         let textOffset = (r * 17) % textLength;
 
@@ -208,7 +206,6 @@ document.addEventListener('DOMContentLoaded', () => {
       for (let i = 0; i < this.particles.length; i++) {
         const p = this.particles[i];
 
-        // Deslizamento sutil e pausado de 10px por segundo (sem velocidade acelerada)
         const rowShift = this.time * 10 * p.direction;
         const rawX = (p.colIndex * this.letterSpacing) + rowShift;
         
@@ -233,11 +230,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
           const angle = Math.atan2(dy, dx);
           targetX = currentOriginX - Math.cos(angle) * force;
-          targetY = currentOriginY - Math.sin(angle) * force;
+          targetY = currentOriginY - Sin(angle) ? currentOriginY - Math.sin(angle) * force : currentOriginY;
         }
 
-        p.x += (targetX - p.x) * 0.12;
-        p.y += (targetY - p.y) * 0.12;
+        // ELIMINAÇÃO DO VOO DE CARACTERES: Quando o caractere reinicia a volta na borda, realiza o teleporte imediato!
+        if (Math.abs(targetX - p.x) > this.letterSpacing * 6) {
+          p.x = targetX;
+          p.y = targetY;
+        } else {
+          p.x += (targetX - p.x) * 0.12;
+          p.y += (targetY - p.y) * 0.12;
+        }
 
         if (isHovered) {
           const proximity = (this.mouse.radius - distance) / this.mouse.radius;
