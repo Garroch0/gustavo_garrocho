@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://gustavogarrocho.com.br/sitemap.xml

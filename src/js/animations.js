@@ -1,13 +1,13 @@
 /**
  * Gustavo Garrocho — Motor de Texto Interativo 2xa.studio
- * Deslizamento Cinemático (10px/s) com Teleporte de Borda e Repulsão Vetorial Suave
+ * Espalhamento Central Intensificado (65px) + Opacidade Verde-Lima 100% Sólida no Centro do Cursor
  * DPOS 2026
  */
 
 document.addEventListener('DOMContentLoaded', () => {
 
   // --------------------------------------------------------------------------
-  // 1. MOTOR CANVAS 2D DE TEXTO INTERATIVO (REDUÇÃO DE WRAP + HOVER ESTÁVEL)
+  // 1. MOTOR CANVAS 2D DE TEXTO INTERATIVO (HOVER AMBIENTE 100% OPACIDADE VERDE)
   // --------------------------------------------------------------------------
   class InteractiveTextBackground {
     constructor(canvasId = 'hero-text-canvas', sectionId = 'hero') {
@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
       this.rawText = `DRIVEN DESIGN STUDIO BETWEEN BRAND STRATEGY VISUAL IDENTITY DIGITIZATION PROCESSES SHAPED BY INPUT NO SINGLE OUTCOME IS TREATED AS FINAL SYSTEMATICS UNFOLD THROUGH DEPENDENCY AND ITERATION EACH STATE EMERGES FROM PREVIOUS CONDITIONS AND INFLUENCES WHAT FOLLOWS CHANGE IS NOT AN EFFECT APPLIED AFTERWARD BUT AN INHERENT PROPERTY OF THE SYSTEM COMPUTATIONAL DESIGN DRAWS INPUT FROM EXISTING CONDITIONS INCLUDING MACHINE PROCESSES HUMAN INTENTIONS AND BRAND STRATEGY `;
 
       this.particles = [];
-      this.mouse = { x: -9999, y: -9999, radius: 210, active: false };
+      this.mouse = { x: -9999, y: -9999, radius: 250, active: false }; // Raio amplo de 250px
       this.time = 0;
       this.isPaused = false;
       this.animationFrameId = null;
@@ -147,7 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
             rowIndex: r,
             originY: originY,
             direction: direction,
-            forceFactor: 1.0 + (Math.sin(c * 0.5 + r) * 0.2)
+            forceFactor: 1.0 + (Math.sin(c * 0.5 + r) * 0.25)
           });
         }
       }
@@ -224,8 +224,9 @@ document.addEventListener('DOMContentLoaded', () => {
           isHovered = true;
           const proximity = (this.mouse.radius - distance) / this.mouse.radius;
           
+          // Espalhamento central intensificado (65px)
           const smoothFactor = Math.sin(proximity * Math.PI * 0.5);
-          const maxForce = 44 * p.forceFactor;
+          const maxForce = 65 * p.forceFactor;
           const force = smoothFactor * maxForce;
 
           const angle = Math.atan2(dy, dx);
@@ -233,23 +234,25 @@ document.addEventListener('DOMContentLoaded', () => {
           targetY = currentOriginY - Math.sin(angle) * force;
         }
 
-        // Teleporte imediato de borda no wrap para evitar caracteres flutuando pela tela
+        // Teleporte imediato de borda no wrap para evitar rastro de caracteres
         if (Math.abs(targetX - p.x) > this.letterSpacing * 6) {
           p.x = targetX;
           p.y = targetY;
         } else {
-          p.x += (targetX - p.x) * 0.12;
-          p.y += (targetY - p.y) * 0.12;
+          p.x += (targetX - p.x) * 0.14;
+          p.y += (targetY - p.y) * 0.14;
         }
 
+        // Renderização com Verde-Lima 100% Opaco Sólido no centro do cursor
         if (isHovered) {
           const proximity = (this.mouse.radius - distance) / this.mouse.radius;
-          const alpha = 0.35 + (proximity * 0.65);
+          // Opacidade verde iniciando em 100% (1.0) no centro do mouse
+          const alpha = 0.35 + (proximity * 0.65); // Centro = 1.0 (100% opaco)
 
-          if (proximity > 0.28) {
-            this.ctx.fillStyle = `rgba(199, 240, 50, ${alpha.toFixed(2)})`;
+          if (proximity > 0.22) {
+            this.ctx.fillStyle = `rgba(199, 240, 50, ${alpha.toFixed(2)})`; // Verde-Lima radiante sólido 100%
           } else {
-            this.ctx.fillStyle = `rgba(242, 242, 242, ${alpha.toFixed(2)})`;
+            this.ctx.fillStyle = `rgba(242, 242, 242, ${alpha.toFixed(2)})`; // Off-white suave na borda
           }
         } else {
           this.ctx.fillStyle = 'rgba(242, 242, 242, 0.35)';
