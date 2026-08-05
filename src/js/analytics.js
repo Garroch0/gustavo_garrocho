@@ -1,6 +1,6 @@
 /**
- * Gustavo Garrocho — Rastreamento de Analytics (Meta Ads & Microsoft Clarity)
- * Carregamento sob demanda do usuário (0ms bloqueio, 0 erros 405 e 0KB JS não usado no PageSpeed)
+ * Gustavo Garrocho — Rastreamento de Analytics (Meta Ads CAPI + Pixel & Microsoft Clarity)
+ * Carregamento sob demanda com disparos duplos (Browser + Server CAPI) e Desduplicação Inteligente
  * Meta Pixel ID Oficial: 2804627116587586
  * Test Event Code: TEST11893
  * Microsoft Clarity ID Oficial: skyn8ao5wu
@@ -72,7 +72,7 @@ setTimeout(() => {
 }, 4500);
 
 document.addEventListener('DOMContentLoaded', () => {
-  // 3. DISPARO DO EVENTO DE CONVERSÃO 'Contact' NOS BOTÕES DE WHATSAPP
+  // 3. DISPARO DE CONVERSÃO DUPLO (BROWSER PIXEL + VERCEL SERVER CAPI)
   const whatsappButtons = document.querySelectorAll(
     'a[href*="wa.me"], a[href*="whatsapp.com"], #whatsapp-link-btn, #hero-cta-btn, #header-cta-btn, .btn-about-cta'
   );
@@ -81,13 +81,32 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.addEventListener('click', () => {
       try {
         loadThirdPartyAnalytics();
+
+        // Chave de Desduplicação Única (Browser & Server)
+        const eventId = `wa_click_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+
+        // A) Disparo no Navegador (Browser Pixel)
         if (typeof fbq === 'function') {
           fbq('track', 'Contact', {
             content_name: 'Clique Botão WhatsApp',
             content_category: 'Lead Conversão',
             destination_url: btn.getAttribute('href')
-          });
+          }, { eventID: eventId });
         }
+
+        // B) Disparo no Servidor (Vercel Serverless CAPI)
+        fetch('/api/conversion', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            eventId: eventId,
+            eventName: 'Contact',
+            sourceUrl: window.location.href
+          })
+        }).catch(() => {});
+
       } catch (e) {}
     });
   });
