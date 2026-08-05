@@ -2,7 +2,7 @@
  * Vercel Serverless Function — Meta Ads Conversions API (CAPI Server-Side)
  * Disparo seguro de conversão de servidor para servidor
  * Pixel ID: 2804627116587586
- * Test Event Code: TEST11893
+ * Test Event Code: TEST94149
  * DPOS 2026
  */
 
@@ -53,7 +53,7 @@ module.exports = async function handler(req, res) {
           }
         }
       ],
-      test_event_code: 'TEST11893'
+      test_event_code: 'TEST94149'
     };
 
     const accessToken = 'EAAOnGOguNUkBSEuz6ZAmPsv3ipLjpYActvvjdZBUaNZCGxPZAc835H2kFI6eaHLOppvZA5mvNyFYS1AZAZCrHIwzZCgHZCHh9fMMoyO4AJvA8vZAu2kFRZAzUyj1gd8oFFW2KvMlAm4R6dfpZAivRnHxgZB2h9wuMaXyZCoX8IuzxuCLNv0K8ZChGhnHy7zt1rP1IkXefZAYSgZDZD';

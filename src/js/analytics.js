@@ -2,13 +2,13 @@
  * Gustavo Garrocho — Rastreamento de Analytics (Meta Ads CAPI + Pixel & Microsoft Clarity)
  * Carregamento sob demanda com disparos duplos (Browser + Server CAPI) e Desduplicação Inteligente
  * Meta Pixel ID Oficial: 2804627116587586
- * Test Event Code: TEST11893
+ * Test Event Code: TEST94149
  * Microsoft Clarity ID Oficial: skyn8ao5wu
  * DPOS 2026
  */
 
 const META_PIXEL_ID = '2804627116587586';
-const META_TEST_EVENT_CODE = 'TEST11893';
+const META_TEST_EVENT_CODE = 'TEST94149';
 const CLARITY_PROJECT_ID = 'skyn8ao5wu';
 
 let analyticsInitialized = false;
@@ -80,7 +80,6 @@ document.addEventListener('DOMContentLoaded', () => {
   whatsappButtons.forEach(btn => {
     btn.addEventListener('click', () => {
       try {
-        // Garantia de Inicialização do Pixel
         loadThirdPartyAnalytics();
 
         // Chave de Desduplicação Única (Browser & Server)
