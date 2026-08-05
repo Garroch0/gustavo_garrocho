@@ -1,6 +1,6 @@
 /**
  * Vercel Serverless Function — Meta Ads Conversions API (CAPI Server-Side)
- * Disparo seguro de conversão de servidor para servidor
+ * Disparo seguro de conversão de servidor para servidor (PageView & Contact)
  * Pixel ID: 2804627116587586
  * Test Event Code: TEST94149
  * DPOS 2026
@@ -27,8 +27,8 @@ module.exports = async function handler(req, res) {
     }
     body = body || {};
 
-    const eventId = body.eventId || `wa_click_${Date.now()}`;
-    const eventName = body.eventName || 'Contact';
+    const eventName = body.eventName || 'PageView';
+    const eventId = body.eventId || `pv_${Date.now()}`;
     const sourceUrl = body.sourceUrl || 'https://gustavogarrocho.com.br/';
 
     const rawIp = req.headers['x-forwarded-for'] || req.socket?.remoteAddress || '127.0.0.1';
@@ -48,8 +48,8 @@ module.exports = async function handler(req, res) {
             client_user_agent: userAgent
           },
           custom_data: {
-            content_name: 'Clique Botão WhatsApp (CAPI)',
-            content_category: 'Lead Conversão'
+            content_name: eventName === 'PageView' ? 'Visualizacao de Pagina (CAPI)' : 'Clique Botao WhatsApp (CAPI)',
+            content_category: eventName === 'PageView' ? 'Navegacao' : 'Lead Conversao'
           }
         }
       ],

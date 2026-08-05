@@ -1,6 +1,6 @@
 /**
  * Gustavo Garrocho — Rastreamento de Analytics (Meta Ads CAPI + Pixel & Microsoft Clarity)
- * Carregamento sob demanda com disparos duplos (Browser + Server CAPI) e Desduplicação Inteligente
+ * Carregamento sob demanda com disparos duplos de PageView e Contact (Browser + Server CAPI)
  * Meta Pixel ID Oficial: 2804627116587586
  * Test Event Code: TEST94149
  * Microsoft Clarity ID Oficial: skyn8ao5wu
@@ -17,7 +17,7 @@ function loadThirdPartyAnalytics() {
   if (analyticsInitialized) return;
   analyticsInitialized = true;
 
-  // 1. CARREGAMENTO SEGURO DO META PIXEL
+  // 1. CARREGAMENTO SEGURO DO META PIXEL E DISPARO DUAL DE PAGEVIEW
   if (META_PIXEL_ID && !window.fbq) {
     try {
       !function(f,b,e,v,n,t,s)
@@ -34,7 +34,22 @@ function loadThirdPartyAnalytics() {
         if (META_TEST_EVENT_CODE) {
           fbq('set', 'testEventCode', META_TEST_EVENT_CODE);
         }
-        fbq('track', 'PageView');
+
+        const pageViewEventId = `pv_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+
+        // Disparo A: Browser Pixel PageView
+        fbq('track', 'PageView', {}, { eventID: pageViewEventId });
+
+        // Disparo B: Server CAPI PageView
+        fetch('/api/conversion', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            eventId: pageViewEventId,
+            eventName: 'PageView',
+            sourceUrl: window.location.href
+          })
+        }).catch(() => {});
       }
     } catch (e) {}
   }
@@ -66,13 +81,13 @@ userInteractionEvents.forEach(evt => {
   window.addEventListener(evt, onFirstUserInteraction, { passive: true, once: true });
 });
 
-// Fallback de segurança para visitantes estáticos após 4.5s
+// Fallback de segurança para visitantes estáticos após 3.0s
 setTimeout(() => {
   loadThirdPartyAnalytics();
-}, 4500);
+}, 3000);
 
 document.addEventListener('DOMContentLoaded', () => {
-  // 3. DISPARO DE CONVERSÃO DUPLO (BROWSER PIXEL + VERCEL SERVER CAPI)
+  // 3. DISPARO DE CONVERSÃO DUPLO NO CLIQUE DE WHATSAPP (BROWSER PIXEL + VERCEL SERVER CAPI)
   const whatsappButtons = document.querySelectorAll(
     'a[href*="wa.me"], a[href*="whatsapp.com"], #whatsapp-link-btn, #hero-cta-btn, #header-cta-btn, .btn-about-cta'
   );
@@ -82,7 +97,6 @@ document.addEventListener('DOMContentLoaded', () => {
       try {
         loadThirdPartyAnalytics();
 
-        // Chave de Desduplicação Única (Browser & Server)
         const eventId = `wa_click_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
 
         // A) Disparo no Navegador (Browser Pixel)
