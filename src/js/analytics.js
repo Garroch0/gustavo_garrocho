@@ -80,6 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
   whatsappButtons.forEach(btn => {
     btn.addEventListener('click', () => {
       try {
+        // Garantia de Inicialização do Pixel
         loadThirdPartyAnalytics();
 
         // Chave de Desduplicação Única (Browser & Server)

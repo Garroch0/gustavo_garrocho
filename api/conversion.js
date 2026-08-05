@@ -7,18 +7,13 @@
  */
 
 module.exports = async function handler(req, res) {
-  // Configuração de Cabeçalhos CORS
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-  res.setHeader(
-    'Access-Control-Allow-Headers',
-    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
-  );
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,POST');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
+    return res.status(200).end();
   }
 
   if (req.method !== 'POST') {
@@ -28,11 +23,7 @@ module.exports = async function handler(req, res) {
   try {
     let body = req.body;
     if (typeof body === 'string') {
-      try {
-        body = JSON.parse(body);
-      } catch (e) {
-        body = {};
-      }
+      try { body = JSON.parse(body); } catch (e) { body = {}; }
     }
     body = body || {};
 
@@ -40,9 +31,9 @@ module.exports = async function handler(req, res) {
     const eventName = body.eventName || 'Contact';
     const sourceUrl = body.sourceUrl || 'https://gustavogarrocho.com.br/';
 
-    const rawIp = req.headers['x-forwarded-for'] || req.socket?.remoteAddress || '';
+    const rawIp = req.headers['x-forwarded-for'] || req.socket?.remoteAddress || '127.0.0.1';
     const clientIp = rawIp.split(',')[0].trim();
-    const userAgent = req.headers['user-agent'] || '';
+    const userAgent = req.headers['user-agent'] || 'Mozilla/5.0';
 
     const payload = {
       data: [
@@ -57,7 +48,7 @@ module.exports = async function handler(req, res) {
             client_user_agent: userAgent
           },
           custom_data: {
-            content_name: 'Clique Botão WhatsApp (Server CAPI)',
+            content_name: 'Clique Botão WhatsApp (CAPI)',
             content_category: 'Lead Conversão'
           }
         }
@@ -70,14 +61,12 @@ module.exports = async function handler(req, res) {
 
     const response = await fetch(`https://graph.facebook.com/v19.0/${pixelId}/events?access_token=${accessToken}`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
 
     const data = await response.json();
-    return res.status(200).json({ success: true, metaResponse: data });
+    return res.status(200).json({ success: true, data: data });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
